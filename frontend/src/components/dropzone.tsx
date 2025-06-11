@@ -1,8 +1,30 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { AiFillFilePdf, AiFillFileWord, AiFillFileImage, AiFillFileUnknown } from 'react-icons/ai';
+import { ImCross } from "react-icons/im";
 
 
+const MAX_FILE_NAME_LENGTH = 30;
+const MAX_FILE_SIZE = 20;
 
+//////////////////////////////////////////////////////
+
+function getFileIcon(file: File) {
+  const type = file.type;
+  if (type === 'application/pdf') 
+      return <AiFillFilePdf className="inline-block mr-2 text-red-600" />;
+  if (type === 'application/msword' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    return <AiFillFileWord className="inline-block mr-2 text-blue-600" />;
+  if (type.startsWith('image/')) 
+      return <AiFillFileImage className="inline-block mr-2 text-green-600" />;
+  return <AiFillFileUnknown className="inline-block mr-2 text-gray-400" />;
+}
+
+function truncateFilename(name: string, maxLength: number = MAX_FILE_NAME_LENGTH) {
+  if (name.length <= maxLength) return name;
+  return name.slice(0, maxLength) + '...';
+}
+/////////////////////////////////////////////////////
 function Dropzone() {
     const [allFiles, setAllFiles] = useState<File[]>([]);
 
@@ -35,8 +57,15 @@ function Dropzone() {
         });
     };
 
+    const removeFileItem = (index: number) => {
+        setAllFiles((previousFiles) => {
+            const newFiles = [...previousFiles];
+            newFiles.splice(index, 1);
+            return newFiles
+        })
+    }
+
     const {
-        acceptedFiles,
         fileRejections,
         getRootProps,
         getInputProps,
@@ -51,19 +80,37 @@ function Dropzone() {
             'application/vnd.ms-powerpoint': [], // .ppt
             'application/vnd.openxmlformats-officedocument.presentationml.presentation': [], // .pptx
         },
-        maxSize: 10 * 1024 * 1024,
+        maxSize: MAX_FILE_SIZE * 1024 * 1024,
     });
 
+
     const files = allFiles.map((file, i) => (
-        <li key={`${file.path}-${i}`}>
-        {file.path} - {(file.size / (1024 * 1024)).toFixed(2)} MB
-        </li>
+      <li key={`${file.name}-${i}`} className="flex justify-between items-center pr-8 pl-5">
+        <div className="flex items-center">
+            <button className="mr-3 group"
+                    onClick={() => removeFileItem(i)}>
+              <ImCross className="w-: h-2 group-hover:text-red-500 group-hover:scale-150 transition-all ease-in-out"/>
+            </button>
+          {getFileIcon(file)}
+          <span>{truncateFilename(file.name)}</span>
+        </div>
+        <span>{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
+      </li>
     ));
 
-    const rejected = fileRejections.map(({ file, errors }, index) => (
-        <li key={`${file.name}-${index}`}>
-        {file.name} - <strong>{(file.size / (1024 * 1024)).toFixed(2)} MB</strong>
-        </li>
+
+    const rejected = fileRejections.map(({ file }, index) => (
+     <li key={`${file.name}-${index}`} className="flex justify-between items-center pr-8 pl-5">
+        <div className="flex items-center">
+            <button className="mr-3 group"
+                onClick={() => removeFileItem(index)}>
+              <ImCross className="w-: h-2 group-hover:text-red-500 group-hover:scale-150 transition-all ease-in-out"/>
+            </button>
+          {getFileIcon(file)}
+          <span>{truncateFilename(file.name)}</span>
+        </div>
+        <span><strong>{(file.size / (1024 * 1024)).toFixed(2)} MB</strong></span>
+      </li>
     ));
 
     return (
@@ -76,7 +123,7 @@ function Dropzone() {
             >
             <input {...getInputProps()} />
             <p>Click or drop files here</p>
-            <p className="mt-5">Max: 10MB per file</p>
+            <p className="mt-5">Max: {MAX_FILE_SIZE}MB per file</p>
             </div>
 
             <aside>
@@ -85,11 +132,10 @@ function Dropzone() {
                 <button
                     type = "button"
                     onClick = {processFiles}
-                    className = "border-2 mt-5 px-6 rounded-xl py-2 bg-blue-400 text-white \
+                    className = "border-2 mt-5 mb-5 px-6 rounded-xl py-2 bg-blue-400 text-white \
                     hover:bg-blue-500 hover:scale-110 transition-all ease-in-out">
                    Process Files 
                 </button>
-                <h4 className="font-semibold mb-2 mt-4">Accepted Files</h4>
                 <ul className="text-sm text-gray-700 list-disc list-inside">{files}</ul>
                 </>
             )}
