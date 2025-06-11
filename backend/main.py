@@ -1,12 +1,9 @@
 from contextlib import asynccontextmanager
-from typing import Annotated
-from fastapi import FastAPI, Depends
-from sqlmodel import Session
-
-from pydantic_schemas.models import Item
-from db.db_setup import get_session,create_db_and_tables,Hero
-
-Session = Annotated[Session, Depends(get_session)]
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from db.db_setup import create_db_and_tables
+ 
+from api.file_api import router as file_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,14 +14,21 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
 
-app = FastAPI(lifespan = lifespan)
+app = FastAPI(
+        lifespan = lifespan,
+        title="QnA Generator",
+        description="Generate Flashcards via Files")
+ 
+origins = [
+    "http://localhost:5173",  # React frontend URL
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allow only specific origins (i.e., React frontend)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
-@app.get("/")
-async def root ():
-    return {"message": "Hello World"}
-
-@app.post("/items/")
-def create_item(item: Item):
-    return item
-
+app.include_router(file_router, prefix="/api")

@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
+
+
 function Dropzone() {
     const [allFiles, setAllFiles] = useState<File[]>([]);
 
@@ -15,6 +17,23 @@ function Dropzone() {
             reader.readAsArrayBuffer(file);
         });
     }, []);
+
+    const processFiles = () => {
+        allFiles.forEach((file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('filename', file.name);
+            formData.append('file_size', file.size.toString());
+
+          fetch('http://localhost:8000/api/upload', {
+            method: 'POST',
+            body: formData,
+          })
+            .then(res => res.json())
+            .then(data => console.log('Uploaded:', data))
+            .catch(err => console.error('Upload error:', err));
+        });
+    };
 
     const {
         acceptedFiles,
@@ -63,6 +82,13 @@ function Dropzone() {
             <aside>
             {allFiles.length > 0 && (
                 <>
+                <button
+                    type = "button"
+                    onClick = {processFiles}
+                    className = "border-2 mt-5 px-6 rounded-xl py-2 bg-blue-400 text-white \
+                    hover:bg-blue-500 hover:scale-110 transition-all ease-in-out">
+                   Process Files 
+                </button>
                 <h4 className="font-semibold mb-2 mt-4">Accepted Files</h4>
                 <ul className="text-sm text-gray-700 list-disc list-inside">{files}</ul>
                 </>

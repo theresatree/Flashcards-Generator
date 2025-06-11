@@ -1,5 +1,5 @@
 from sqlmodel import Session, SQLModel, create_engine
-from db.db_models import Hero
+from db.db_models import file_model 
 
 sqlite_file_name = "database.db"
 sqlite_file_path ="db"
