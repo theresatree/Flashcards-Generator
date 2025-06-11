@@ -1,17 +1,27 @@
-import Dropzone from "./components/dropzone.tsx"
+import Dropzone from "./components/dropzone.tsx";
+import SplitText from "./components/splitText.tsx"
 
 function App() {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm text-center">
-        <h2 className="text-2xl font-bold text-gray-800">Card</h2>
-        <p className="text-gray-600 mt-3">
-            Dropzone testing
-        </p>
-        <Dropzone />
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-            Learn More
-        </button>
-    </div>
-  );
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#303030]">
+            <SplitText
+            text="Upload files to begin"
+            className="text-5xl font-semibold text-center mb-3 leading-relaxed text-[#FEEEEE]"
+            delay={50}
+            duration={0.3}
+            ease="power3.out"
+            splitType="chars"
+            from={{ opacity: 0, y: 40 }}
+            to={{ opacity: 1, y: 0 }}
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="center"
+            />
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xl text-center">
+                <Dropzone />
+            </div>
+        </div>
+    );
 }
+
 export default App;

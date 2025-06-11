@@ -32,7 +32,7 @@ function Dropzone() {
             'application/vnd.ms-powerpoint': [], // .ppt
             'application/vnd.openxmlformats-officedocument.presentationml.presentation': [], // .pptx
         },
-        maxSize:  1024 * 1024,
+        maxSize: 10 * 1024 * 1024,
     });
 
     const files = allFiles.map((file, i) => (
@@ -51,19 +51,19 @@ function Dropzone() {
         <section className="container">
         <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-md px-6 py-10 mt-4 transition-colors duration-200
+        className={`border-2 border-dashed rounded-md px-6 py-10 mt-1 transition-colors duration-200
             ${isDragActive ? 'bg-blue-50 border-blue-400' : 'bg-gray-100 border-gray-300'}
             text-gray-600 text-sm`}
             >
             <input {...getInputProps()} />
             <p>Click or drop files here</p>
-            <p className="mt-5">Maximum: 10MB</p>
+            <p className="mt-5">Max: 10MB per file</p>
             </div>
 
-            <aside className="mt-4">
+            <aside>
             {allFiles.length > 0 && (
                 <>
-                <h4 className="font-semibold mb-2">Accepted Files</h4>
+                <h4 className="font-semibold mb-2 mt-4">Accepted Files</h4>
                 <ul className="text-sm text-gray-700 list-disc list-inside">{files}</ul>
                 </>
             )}
