@@ -2,7 +2,8 @@ import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { AiFillFilePdf, AiFillFileWord, AiFillFileImage, AiFillFileUnknown } from 'react-icons/ai';
 import { ImCross } from "react-icons/im";
-
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const MAX_FILE_NAME_LENGTH = 30;
 const MAX_FILE_SIZE = 20;
@@ -24,8 +25,11 @@ function truncateFilename(name: string, maxLength: number = MAX_FILE_NAME_LENGTH
   if (name.length <= maxLength) return name;
   return name.slice(0, maxLength) + '...';
 }
+
 /////////////////////////////////////////////////////
+
 function Dropzone() {
+    const navigate = useNavigate();
     const [allFiles, setAllFiles] = useState<File[]>([]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -40,21 +44,43 @@ function Dropzone() {
         });
     }, []);
 
-    const processFiles = () => {
-        allFiles.forEach((file) => {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('filename', file.name);
-            formData.append('file_size', file.size.toString());
+    const processFiles = async () => {
+        const results = await Promise.all(
+            allFiles.map(async (file) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('filename', file.name);
+                formData.append('file_size', file.size.toString());
 
-          fetch('http://localhost:8000/api/upload', {
-            method: 'POST',
-            body: formData,
-          })
-            .then(res => res.json())
-            .then(data => console.log('Uploaded:', data))
-            .catch(err => console.error('Upload error:', err));
-        });
+                try {
+                    const res = await fetch('http://localhost:8000/api/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!res.ok) {
+                        console.error(`Failed to upload ${file.name}`, await res.text());
+                        return { file, success: false };
+                    }
+
+                    const data = await res.json();
+                    console.log('Uploaded:', data);
+                    return { file, success: true };
+                } catch (err) {
+                    console.error('Upload error:', err);
+                    return { file, success: false };
+                }
+            })
+        );
+
+        const allSuccessful = results.every(result => result.success);
+
+        if (allSuccessful) {
+            toast.success("Files successfully uploaded")
+            navigate("/dashboard");
+        } else {
+            toast.error("Some files failed to upload")
+        }
     };
 
     const removeFileItem = (index: number) => {
