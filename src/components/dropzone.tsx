@@ -1,30 +1,17 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { AiFillFilePdf, AiFillFileWord, AiFillFileImage, AiFillFileUnknown } from 'react-icons/ai';
 import { ImCross } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
+import type { FileItem } from '../models/models';
+import { addItemWithKey } from '../db_utils/add_item';
+import { getFileIcon } from '../utils/getFileIcon';
+import { truncateFilename } from '../utils/truncateString';
+import { generateProjectId } from '../utils/generateProjectID';
+
 const MAX_FILE_NAME_LENGTH = 30;
-const MAX_FILE_SIZE = 20;
-
-//////////////////////////////////////////////////////
-
-function getFileIcon(file: File) {
-  const type = file.type;
-  if (type === 'application/pdf') 
-      return <AiFillFilePdf className="inline-block mr-2 text-red-600" />;
-  if (type === 'application/msword' || type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-    return <AiFillFileWord className="inline-block mr-2 text-blue-600" />;
-  if (type.startsWith('image/')) 
-      return <AiFillFileImage className="inline-block mr-2 text-green-600" />;
-  return <AiFillFileUnknown className="inline-block mr-2 text-gray-400" />;
-}
-
-function truncateFilename(name: string, maxLength: number = MAX_FILE_NAME_LENGTH) {
-  if (name.length <= maxLength) return name;
-  return name.slice(0, maxLength) + '...';
-}
+const MAX_FILE_SIZE = 40;
 
 /////////////////////////////////////////////////////
 
@@ -44,43 +31,38 @@ function Dropzone() {
         });
     }, []);
 
+
     const processFiles = async () => {
+     const projectID = generateProjectId() 
+      try {
         const results = await Promise.all(
-            allFiles.map(async (file) => {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('filename', file.name);
-                formData.append('file_size', file.size.toString());
+          allFiles.map(async (file) => {
+            const item: FileItem = {
+              project_id: projectID,
+              filename: file.name,
+              file_size: file.size,
+              file: file,
+              flashcards: [],
+            };
 
-                try {
-                    const res = await fetch('http://localhost:8000/api/upload', {
-                        method: 'POST',
-                        body: formData,
-                    });
+            await addItemWithKey(item);
+            return { success: true };
 
-                    if (!res.ok) {
-                        console.error(`Failed to upload ${file.name}`, await res.text());
-                        return { file, success: false };
-                    }
-
-                    const data = await res.json();
-                    console.log('Uploaded:', data);
-                    return { file, success: true };
-                } catch (err) {
-                    console.error('Upload error:', err);
-                    return { file, success: false };
-                }
-            })
+          })
         );
 
         const allSuccessful = results.every(result => result.success);
 
         if (allSuccessful) {
-            toast.success("Files successfully uploaded")
-            navigate("/dashboard");
+          toast.success("Files successfully uploaded");
+          navigate("/dashboard");
         } else {
-            toast.error("Some files failed to upload")
+          toast.error("Some files failed to upload");
         }
+      } catch (error) {
+        toast.error("An error occurred during file upload");
+        console.error(error);
+      }
     };
 
     const removeFileItem = (index: number) => {
@@ -118,7 +100,7 @@ function Dropzone() {
               <ImCross className="w-: h-2 group-hover:text-red-500 group-hover:scale-150 transition-all ease-in-out"/>
             </button>
           {getFileIcon(file)}
-          <span>{truncateFilename(file.name)}</span>
+          <span>{truncateFilename(file.name, MAX_FILE_NAME_LENGTH)}</span>
         </div>
         <span>{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
       </li>
@@ -133,7 +115,7 @@ function Dropzone() {
               <ImCross className="w-: h-2 group-hover:text-red-500 group-hover:scale-150 transition-all ease-in-out"/>
             </button>
           {getFileIcon(file)}
-          <span>{truncateFilename(file.name)}</span>
+          <span>{truncateFilename(file.name, MAX_FILE_NAME_LENGTH)}</span>
         </div>
         <span><strong>{(file.size / (1024 * 1024)).toFixed(2)} MB</strong></span>
       </li>
