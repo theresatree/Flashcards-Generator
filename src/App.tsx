@@ -1,22 +1,27 @@
+
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import FirstPageUpload from "./pages/FirstPageUpload";
-import Dashboard from "./pages/Dashboard";
 import { AnimatePresence } from "motion/react";
+import FirstPageUpload from "./pages/FirstPageUpload";
+import ConfirmFlashCards from "./pages/ConfirmFlashCards";
 import { Toaster } from "./components/ui/sonner";
 
+//Routes + AnimatePresence
 function AppRoutes() {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<FirstPageUpload />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
-      </Routes>
+      <div className="fixed inset-0 bg-[#303030]">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<FirstPageUpload />} />
+          <Route path="/confirmation" element={<ConfirmFlashCards />} />
+        </Routes>
+      </div>
     </AnimatePresence>
   );
 }
 
+//Top-level App with Router & Toaster
 function App() {
   return (
     <Router>

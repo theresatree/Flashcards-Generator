@@ -55,7 +55,7 @@ function Dropzone() {
 
         if (allSuccessful) {
           toast.success("Files successfully uploaded");
-          navigate("/dashboard");
+          navigate("/confirmation");
         } else {
           toast.error("Some files failed to upload");
         }
@@ -81,7 +81,6 @@ function Dropzone() {
     } = useDropzone({
         onDrop,
         accept: {
-            'image/*': [],
             'application/pdf': [],
             'application/msword': [], // .doc
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [], // .docx

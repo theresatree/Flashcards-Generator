@@ -1,5 +1,7 @@
 import Dropzone from "../../components/dropzone.tsx";
 import SplitText from "../../components/splitText.tsx";
+
+import { Link } from "react-router-dom";
 import { motion } from "motion/react"
 
 function FirstPageUpload() {
@@ -8,11 +10,10 @@ function FirstPageUpload() {
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{
-                scale: 2,          
                 opacity: 0,
+                backgroundColor: "#303030",
                 transition: {
-                    scale: { duration: 0.4, ease: "easeOut" },
-                    opacity: { duration: 0.2, ease: "easeOut" }
+                    opacity: { duration: 0.3, ease: "easeIn" }
                 }
             }}
             className="fixed inset-0 flex flex-col items-center justify-center bg-[#303030]">
@@ -31,6 +32,15 @@ function FirstPageUpload() {
             />
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xl text-center">
                 <Dropzone />
+            </div>
+            <div className="flex flex-col items-center justify-center text-sm mt-3 italic text-[#FEEEEE]">
+                <span>
+                    <Link to="/manual" className="underline text-[#ADD8E6]">Click here</Link> {" "}
+                    to manually create flashcards from your own LLM 
+                </span>
+                <span className="mt-5">
+                    This flashcard generator will <span className="underline decoration-red-500">only be able to parse text</span> from documents
+                </span>
             </div>
         </motion.div>
     );
