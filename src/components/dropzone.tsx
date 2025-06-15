@@ -82,9 +82,7 @@ function Dropzone() {
         onDrop,
         accept: {
             'application/pdf': [],
-            'application/msword': [], // .doc
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [], // .docx
-            'application/vnd.ms-powerpoint': [], // .ppt
             'application/vnd.openxmlformats-officedocument.presentationml.presentation': [], // .pptx
         },
         maxSize: MAX_FILE_SIZE * 1024 * 1024,
