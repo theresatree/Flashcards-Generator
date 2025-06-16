@@ -26,7 +26,6 @@ export async function parseMostRecentProject(): Promise<string[]>{
     for (const item of files){
         const file: File = item.file as File // convert blob to File 
         const file_type = getFileType(file)         
-            toast.error(`Failed to parse ${file.name}`)
         if (file_type == "pdf"){
              file_contents = await parsePDF(file)
         } else if (file_type == "docx"){
@@ -37,6 +36,7 @@ export async function parseMostRecentProject(): Promise<string[]>{
             toast.error(`Failed to parse ${file.name}`)
             continue;
         }
+        toast.success(`Successfully parsed ${file.name}`)
         all_file_contents.push(file_contents)
     }
 
