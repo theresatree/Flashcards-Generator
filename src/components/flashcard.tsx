@@ -1,16 +1,24 @@
-import { Skeleton } from "../components/ui/skeleton"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 function Flashcard() {
-    return (
-        <div className="flex items-center space-x-4">
-            <Skeleton className="h-[100px] w-[450px] p-4 rounded-lg bg-transparent border-gray-300 border-4">
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-[150px]" />
-                    <Skeleton className="h-4 w-[400px]" />
-                </div>
-            </Skeleton>
-        </div>
-    );
+  return (
+    <Card className="bg-[#383838] border border-[#555] shadow-lg rounded-xl text-[#f5f5f5] min-w-[450px] max-w-[600px] w-full break-words mt-5">
+      <CardHeader className="mb-1 pb-0 space-y-0">
+        <CardTitle className="text-sm italic font-semibold m-0 p-0">
+          Questions
+        </CardTitle>
+                <CardContent className="text-sm text-[#ddd] pt-0">
+        Answers:
+      </CardContent>
+      </CardHeader>
+
+    </Card>
+  );
 }
 
 export default Flashcard;

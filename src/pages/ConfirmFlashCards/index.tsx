@@ -33,6 +33,7 @@ function ConfirmFlashCards() {
     function listOfFlashcardTitles(count: number){
         return Array.from({ length: count }).map((_, index) => (
             <h3 key={index} className="text-xl ">
+                Title of flashcard
             </h3>
         ));
     }
@@ -42,19 +43,43 @@ function ConfirmFlashCards() {
 
     return (
         <motion.div
-            initial={{ scale: 0.3}}
+            initial={{ scale: 0.3 }}
             animate={{
                 scale: 1,
                 transition: {
                     scale: { duration: 0.7, ease: "backOut" },
-                }
+                },
             }}
-            className="fixed inset-0 flex flex-col items-center justify-center text-[#FEEEEE]">
-            {loading 
-                ? (<FlashcardSkeleton />)
-                : (<div>Hello</div> )
-            }
-            <Progress value={progressValue} className="w-[400px] h-[15px] mt-10 bg-blue-100"/>
+            className="fixed inset-0 flex items-center justify-center"
+        >
+            {loading ? (
+                <div className="flex flex-col items-center justify-center text-[#FEEEEE]">
+                    <FlashcardSkeleton />
+                    <Progress
+                        value={progressValue}
+                        className="w-[400px] h-[15px] mt-10 bg-blue-100"
+                    />
+                </div>
+            ) : (
+                    <div className="flex flex-col gap-10">
+                    <div className="relative min-w-[450px] max-w-[600px] w-full">
+                        <div className="absolute -top-5 left-1 text-[#FEEEEE]">
+                            {listOfFlashcardTitles(1)}
+                        </div>
+                        <div className="flex flex-col  justify-center">
+                            {listOfFlashcards(1)}
+                        </div>
+                    </div>
+                    <div className="relative min-w-[450px] max-w-[600px] w-full">
+                        <div className="absolute -top-5 left-1 text-[#FEEEEE]">
+                            {listOfFlashcardTitles(1)}
+                        </div>
+                        <div className="flex flex-col  justify-center">
+                            {listOfFlashcards(2)}
+                        </div>
+                    </div>
+                    </div>
+                )}
         </motion.div>
     );
 }
