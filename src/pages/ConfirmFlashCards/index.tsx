@@ -3,8 +3,8 @@ import { FlashcardSkeleton } from "../../components/skeletons";
 import { Progress } from "../../components/ui/progress";
 
 import { motion } from "motion/react";
-import { parseMostRecentProject } from "../../utils/parseFiles";
-import { useEffect, useRef, useState, Suspense } from "react";
+import { RAG } from "../../utils/RAG";
+import { useEffect, useRef, useState } from "react";
 
 function ConfirmFlashCards() {
     const [progressValue, setProgressValue] = useState(0)
@@ -16,8 +16,7 @@ function ConfirmFlashCards() {
         ran.current = true;
 
         const run = async () => {
-            const data = await parseMostRecentProject();
-            console.log("Most recent project files:", data);
+            const data = await RAG();
             setProgressValue(100);
             setLoading(false);
         };

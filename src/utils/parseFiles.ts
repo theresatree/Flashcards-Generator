@@ -2,14 +2,15 @@ import * as mammoth from "mammoth";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import JSZip from "jszip";
 
-import type { FileItem } from "../models/models";
+import { truncateFilename } from "./truncateString";
+import type { FileItem, ProjectFilesDict } from "../models/models";
 import { retrieveAllFilesByProjectID, retrieveAllProjectIDs } from "../db_utils/retrieve_item";
 import { getFileType } from "./getFileType";
 import { toast } from "sonner";
 
 
 GlobalWorkerOptions.workerSrc = "/pdf.worker.js";
-
+const MAX_LENGTH = 20;
 
 async function getMostRecentProjectID(): Promise<string>{
     const projectIDs: string[] = await retrieveAllProjectIDs()
@@ -17,15 +18,18 @@ async function getMostRecentProjectID(): Promise<string>{
     return sorted[0] 
 }
 
-export async function parseMostRecentProject(): Promise<string[]>{
+export async function parseMostRecentProject(): Promise<any>{
     const projectID:string = await getMostRecentProjectID()
     const files : FileItem[] = await retrieveAllFilesByProjectID(projectID)
     let file_contents: string = ""
-    const all_file_contents: string[] = [];
+    const all_file_contents: ProjectFilesDict = {}; 
 
     for (const item of files){
         const file: File = item.file as File // convert blob to File 
         const file_type = getFileType(file)         
+        all_file_contents[item.filename] = {
+            text: ""
+        }
         if (file_type == "pdf"){
              file_contents = await parsePDF(file)
         } else if (file_type == "docx"){
@@ -36,8 +40,9 @@ export async function parseMostRecentProject(): Promise<string[]>{
             toast.error(`Failed to parse ${file.name}`)
             continue;
         }
-        toast.success(`Successfully parsed ${file.name}`)
-        all_file_contents.push(file_contents)
+        const truncated_file_name = truncateFilename(file.name, MAX_LENGTH)
+        toast.success(`Successfully parsed ${truncated_file_name}`)
+        all_file_contents[item.filename]["text"] = file_contents 
     }
 
     return all_file_contents

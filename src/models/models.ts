@@ -12,3 +12,15 @@ export interface FileItem {
     file: Blob;
     flashcards: Flashcard[];
 }
+
+export interface ProjectFilesDict {
+    [filename: string]: {
+        text: string;
+    }
+}
+
+export interface ProjectFilesChunk {
+    [filename: string]: {
+        [chunk: number]: string;
+    }
+}
