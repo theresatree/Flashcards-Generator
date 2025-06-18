@@ -2,15 +2,15 @@ import { retrieveAllFilesByProjectID } from "../db_utils/retrieve_item";
 import { updateFile } from "../db_utils/update_item";
 
 export async function generateFlashcards(projectID: string, flashcardLimit = 10) {
-  const files = await retrieveAllFilesByProjectID(projectID);
+    const files = await retrieveAllFilesByProjectID(projectID);
 
-  for (const file of files) {
-    if (!file.chunks) continue;
+    for (const file of files) {
+        if (!file.chunks) continue;
 
-    // ✅ Combine ALL chunks for maximum context
-    const combinedText = file.chunks.join("\n\n---\n\n");
+        // ✅ Combine ALL chunks for maximum context
+        const combinedText = file.chunks.join("\n\n---\n\n");
 
-    const prompt = `
+        const prompt = `
 You are a helpful assistant.
 Please create exactly ${flashcardLimit} high-quality questions and concise answers
 based on the following text.
@@ -24,42 +24,37 @@ and so on.
 
 TEXT:
 ${combinedText}
-    `.trim();
+`.trim();
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "deepseek/deepseek-r1-0528:free",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-      })
-    });
+        const response = await fetch("http://127.0.0.1:8000/sendToLLM", {
+            method: "POST",
+            headers: {"Content-Type": "text/plain"},
+            body: JSON.stringify({contents: prompt}),
+        });
 
-    const data = await response.json();
-    const content = data.choices[0].message.content;
+        if (!response.ok) {
+            console.error(await response.json());
+            throw new Error(`LLM call failed with status ${response.status}`);
+        }
 
-    // ✅ Parse multiple Q/A pairs using regex
-    const regex = /Q\d+: (.*?)\nA\d+: (.*?)(?=\nQ\d+:|\n*$)/gs;
-    const flashcards = [];
-    let match;
-    while ((match = regex.exec(content)) !== null) {
-      flashcards.push({
-        question: match[1].trim(),
-        answer: match[2].trim()
-      });
+        const data = await response.json();
+        console.log(data.text);
+        const content = data.text; 
+
+        const regex = /Q\d+:\s*(.*?)\n+A\d+:\s*(.*?)(?=\n+Q\d+:|\n*$)/gs;
+
+        const flashcards = [];
+        let match;
+        while ((match = regex.exec(content)) !== null) {
+            flashcards.push({
+                question: match[1].trim(),
+                answer: match[2].trim()
+            });
+        }
+
+        file.flashcards = flashcards;
+        console.log(flashcards);
+
+        await updateFile(file);
     }
-
-    file.flashcards = flashcards;
-    console.log(flashcards);
-
-    await updateFile(file);
-  }
 }
