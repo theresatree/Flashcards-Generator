@@ -1,14 +1,21 @@
 import Flashcard from "../../components/flashcard";
 import { FlashcardSkeleton } from "../../components/skeletons";
 import { Progress } from "../../components/ui/progress";
+import { RAG } from "../../utils/RAG";
+import { toast } from "sonner";
+
 
 import { motion } from "motion/react";
-import { RAG } from "../../utils/RAG";
+
 import { useEffect, useRef, useState } from "react";
+import { retrieveAllFilesByProjectID } from "../../db_utils/retrieve_item";
+import type { FileItem } from "@/models/models";
 
 function ConfirmFlashCards() {
-    const [progressValue, setProgressValue] = useState(0)
+    const [progressValue, setProgressValue] = useState(0);
+    const [progressText, setProgressText] = useState("");
     const [loading, setLoading] = useState(true)
+    const [mostRecentFiles, setMostRecentFiles] = useState<FileItem[]>([]);
     const ran = useRef(false);
 
     useEffect(() => {
@@ -16,29 +23,50 @@ function ConfirmFlashCards() {
         ran.current = true;
 
         const run = async () => {
-            const data = await RAG();
-            setProgressValue(100);
-            setLoading(false);
+            try {
+                const mostRecentProjectID = await RAG((v, text) => {
+                    setProgressValue(v);
+                    setProgressText(text);
+                });
+                if (mostRecentProjectID) {
+                    setLoading(false);
+                    setMostRecentFiles(await retrieveAllFilesByProjectID(mostRecentProjectID))
+                    console.log(mostRecentFiles)
+                } else {
+                    toast.error("Error generating flashcard. Please restart");
+                }
+            } catch (error) {
+                console.error("Caught RAG error:", error);
+                toast.error("Error: " + (error instanceof Error ? error.message : String(error)));
+            }
         };
+
         run();
     }, []);
 
-    function listOfFlashcards(count: number){
-        return Array.from({ length: count }).map((_, index) => (
-            <Flashcard key={index} />
+
+    function renderFlashcards() {
+        return mostRecentFiles.map((file, i) => (
+            <div
+                key={i}
+                className="w-full max-w-[800px]"
+            >
+                <h3 className="text-lg font-semibold mb-2 text-[#FEEEEE]">
+                    {file.filename}
+                </h3>
+                <div >
+                    {file.flashcards.map((fc, j) => (              
+                        <Flashcard
+                            key={j}
+                            questions={fc.question}
+                            answers={fc.answer}
+                        />
+                    ))}
+                </div>
+            </div>
         ));
     }
 
-    function listOfFlashcardTitles(count: number){
-        return Array.from({ length: count }).map((_, index) => (
-            <h3 key={index} className="text-xl ">
-                Title of flashcard
-            </h3>
-        ));
-    }
-
-
-    ////////******** PUT ALL THE ONES ABOVE IN A FUNCTION
 
     return (
         <motion.div
@@ -49,35 +77,21 @@ function ConfirmFlashCards() {
                     scale: { duration: 0.7, ease: "backOut" },
                 },
             }}
-            className="fixed inset-0 flex items-center justify-center"
+            className="fixed inset-0 overflow-auto p-6"
         >
             {loading ? (
-                <div className="flex flex-col items-center justify-center text-[#FEEEEE]">
+                <div className="flex flex-col items-center justify-center text-[#FEEEEE] min-h-full">
                     <FlashcardSkeleton />
                     <Progress
                         value={progressValue}
-                        className="w-[400px] h-[15px] mt-10 bg-blue-100"
+                        className="w-[400px] h-[15px] mt-15 bg-blue-100"
                     />
+                    <div className="t-m mt-5">{progressText}</div>
                 </div>
             ) : (
-                    <div className="flex flex-col gap-10">
-                    <div className="relative min-w-[450px] max-w-[600px] w-full">
-                        <div className="absolute -top-5 left-1 text-[#FEEEEE]">
-                            {listOfFlashcardTitles(1)}
-                        </div>
-                        <div className="flex flex-col  justify-center">
-                            {listOfFlashcards(1)}
-                        </div>
-                    </div>
-                    <div className="relative min-w-[450px] max-w-[600px] w-full">
-                        <div className="absolute -top-5 left-1 text-[#FEEEEE]">
-                            {listOfFlashcardTitles(1)}
-                        </div>
-                        <div className="flex flex-col  justify-center">
-                            {listOfFlashcards(2)}
-                        </div>
-                    </div>
-                    </div>
+                <div className="flex flex-col items-center gap-10 w-full min-h-full">
+                  {renderFlashcards()}
+                </div>
                 )}
         </motion.div>
     );

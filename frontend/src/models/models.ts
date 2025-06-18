@@ -1,8 +1,8 @@
 // This is for all the models used in this project
 
 export interface Flashcard {
-    question?: string
-    answer?: string
+    question: string
+    answer: string
 }
 
 export interface FileItem {

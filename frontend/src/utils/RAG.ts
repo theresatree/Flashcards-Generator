@@ -13,7 +13,7 @@ import { generateFlashcards } from "./genereateFlashCards";
 // 4. Store vectors and data into DB
 // 5. Query
 
-export async function RAG() {
+export async function RAG(setProgress: (v:number, text:string) => void): Promise<string> {
     try {
         console.log("RAG: Starting RAG process...");
         
@@ -23,10 +23,10 @@ export async function RAG() {
         const { projectID, files: data } = await parseMostRecentProject(); // Step 1
         console.log("RAG: Project ID:", projectID);
         console.log("RAG: Files found:", Object.keys(data));
+        setProgress(10, "Finished parsing files")
 
         for (const filename in data) {
             const chunks = TextToChunks(data[filename].text); // Step 2
-            console.log(`RAG: Created ${chunks.length} chunks for ${filename}`);
 
             // Make sure the update object exists for this filename
             updates[filename] = {
@@ -37,7 +37,6 @@ export async function RAG() {
             updates[filename].chunks = chunks;
 
             // Then embed each chunk
-            console.log(`RAG: Step 3 - Embedding chunks for ${filename}...`);
             for (let i = 0; i < chunks.length; i++) {
                 const chunk = chunks[i];
                 try {
@@ -46,21 +45,23 @@ export async function RAG() {
                 } catch (error) {
                     throw error;
                 }
+
+            setProgress(20+Math.floor(((i/chunks.length)*50)), "Chunking and embedding files")
             }
         }
 
-        console.log("RAG: Step 4 - Updating database with chunks and embeddings...");
         await updateFileWithChunksAndEmbeddings(projectID, updates); // Step 4
-        console.log("RAG: Database updated successfully");
+        setProgress(70, "Updated details to database");
         
-        console.log("RAG: Step 5 - Generating flashcards...");
+        setProgress(75, "Generating flashcards via LLM");
         await generateFlashcards(projectID); //Step 5
-        console.log("RAG: Flashcards generated successfully");
+        setProgress(100, "Finished generating flashcards")
         
-        console.log("RAG: Process completed successfully!");
-        
+    return projectID 
+
     } catch (error) {
         console.error("RAG: Error in RAG process:", error);
         throw error;
     }
+
 }
