@@ -5,6 +5,14 @@ export interface Flashcard {
     answer: string
 }
 
+export interface StackedFlashcardProps {
+  question: string;
+  answer: string;
+  index: number; // j
+  isExpanded: boolean;
+  toggleStack: () => void;
+}
+
 export interface FileItem {
     project_id: string;
     filename: string;

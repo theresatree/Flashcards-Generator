@@ -10,7 +10,6 @@ import { toast } from "sonner";
 
 
 GlobalWorkerOptions.workerSrc = "/pdf.worker.js";
-const MAX_LENGTH = 20;
 
 export async function getMostRecentProjectID(): Promise<string>{
     const projectIDs: string[] = await retrieveAllProjectIDs()
@@ -40,8 +39,6 @@ export async function parseMostRecentProject(): Promise<{ projectID: string; fil
             toast.error(`Failed to parse ${file.name}`)
             continue;
         }
-        const truncated_file_name = truncateFilename(file.name, MAX_LENGTH)
-        toast.success(`Successfully parsed ${truncated_file_name}`)
         all_file_contents[item.filename]["text"] = file_contents 
     }
 

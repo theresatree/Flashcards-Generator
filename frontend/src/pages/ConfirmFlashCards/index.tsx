@@ -1,4 +1,4 @@
-import Flashcard from "../../components/flashcard";
+import { StackedFlashCard } from "../../components/stackedCards";
 import { FlashcardSkeleton } from "../../components/skeletons";
 import { Progress } from "../../components/ui/progress";
 import { RAG } from "../../utils/RAG";
@@ -9,6 +9,7 @@ import { motion } from "motion/react";
 
 import { useEffect, useRef, useState } from "react";
 import { retrieveAllFilesByProjectID } from "../../db_utils/retrieve_item";
+import { truncateFilename } from "../../utils/truncateString";
 import type { FileItem } from "@/models/models";
 
 function ConfirmFlashCards() {
@@ -16,7 +17,9 @@ function ConfirmFlashCards() {
     const [progressText, setProgressText] = useState("");
     const [loading, setLoading] = useState(true)
     const [mostRecentFiles, setMostRecentFiles] = useState<FileItem[]>([]);
+    const [expandedStacks, setExpandedStacks] = useState<number[]>([]);
     const ran = useRef(false);
+    const MAX_FILE_LENGTH = 70;
 
     useEffect(() => {
         if (ran.current) return; // ✅ already ran once
@@ -45,28 +48,42 @@ function ConfirmFlashCards() {
     }, []);
 
 
-    function renderFlashcards() {
-        return mostRecentFiles.map((file, i) => (
-            <div
-                key={i}
-                className="w-full max-w-[800px]"
-            >
-                <h3 className="text-lg font-semibold mb-2 text-[#FEEEEE]">
-                    {file.filename}
-                </h3>
-                <div >
-                    {file.flashcards.map((fc, j) => (              
-                        <Flashcard
-                            key={j}
-                            questions={fc.question}
-                            answers={fc.answer}
-                        />
-                    ))}
-                </div>
-            </div>
-        ));
+
+    function toggleStack(index: number) {
+        setExpandedStacks((prev) =>
+            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+        );
     }
 
+    function renderFlashcards() {
+        return mostRecentFiles.map((file, i) => {
+            const isExpanded = expandedStacks.includes(i);
+
+            return (
+                <div key={i} className="w-full max-w-[800px] mb-2">
+                    <h3
+                        className="text-lg font-semibold mb-2 text-[#FEEEEE] cursor-pointer"
+                        onClick={() => toggleStack(i)}
+                    >
+                        {truncateFilename(file.filename, MAX_FILE_LENGTH)}
+                    </h3>
+
+                    <div className="relative w-full min-h-[200px]">
+                        {file.flashcards.map((fc, j) => (
+                            <StackedFlashCard
+                              key={j}
+                              question={fc.question}
+                              answer={fc.answer}
+                              index={j}
+                              isExpanded={isExpanded}
+                              toggleStack={() => toggleStack(i)}
+                            />
+                        ))}
+                    </div>
+                </div>
+            );
+        });
+    }
 
     return (
         <motion.div
@@ -89,9 +106,9 @@ function ConfirmFlashCards() {
                     <div className="t-m mt-5">{progressText}</div>
                 </div>
             ) : (
-                <div className="flex flex-col items-center gap-10 w-full min-h-full">
-                  {renderFlashcards()}
-                </div>
+                    <div className="flex flex-col items-center gap-10 w-full min-h-full">
+                        {renderFlashcards()}
+                    </div>
                 )}
         </motion.div>
     );
