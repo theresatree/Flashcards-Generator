@@ -4,7 +4,7 @@ import { parseMostRecentProject } from "./parseFiles";
 import { TextToChunks } from "./splitText";
 import { EmbedChunks } from "./embedChunks";
 import { updateFileWithChunksAndEmbeddings } from "../db_utils/update_item";    
-import { generateFlashcards } from "./genereateFlashCards";
+import { generateFlashcards } from "./generateFlashCards";
 
 // RAG comes in 5 steps
 // 1. Convert to text
