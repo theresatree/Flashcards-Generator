@@ -1,5 +1,6 @@
 import { retrieveAllFilesByProjectID } from "../db_utils/retrieve_item";
 import { updateFile } from "../db_utils/update_item";
+import { toast } from "sonner";
 
 export async function generateFlashcards(projectID: string, flashcardLimit = 10) {
     const files = await retrieveAllFilesByProjectID(projectID);
@@ -54,6 +55,9 @@ ${combinedText}
 
         file.flashcards = flashcards;
         console.log(flashcards);
+        if (flashcards.length === 0){
+            toast.error(`Error generating flashcards for ${file.filename}`)
+        }
 
         await updateFile(file);
     }

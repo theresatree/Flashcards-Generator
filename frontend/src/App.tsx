@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { AnimatePresence } from "motion/react";
 import FirstPageUpload from "./pages/FirstPageUpload";
 import ConfirmFlashCards from "./pages/ConfirmFlashCards";
+import Dashboard from "./pages/Dashboard";  
 import { Toaster } from "./components/ui/sonner";
 
 //Routes + AnimatePresence
@@ -15,6 +16,7 @@ function AppRoutes() {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<FirstPageUpload />} />
           <Route path="/confirmation" element={<ConfirmFlashCards />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </div>
     </AnimatePresence>

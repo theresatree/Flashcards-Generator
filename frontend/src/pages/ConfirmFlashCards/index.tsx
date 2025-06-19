@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
 
 import { useEffect, useRef, useState } from "react";
 import { retrieveAllFilesByProjectID } from "../../db_utils/retrieve_item";
@@ -94,6 +95,12 @@ function ConfirmFlashCards() {
                     scale: { duration: 0.7, ease: "backOut" },
                 },
             }}
+            exit={{
+                opacity: 0,
+                transition: {
+                    opacity: { duration: 0.3, ease: "easeIn" }
+                }
+            }}
             className="fixed inset-0 overflow-auto p-6"
         >
             {loading ? (
@@ -108,6 +115,20 @@ function ConfirmFlashCards() {
             ) : (
                     <div className="flex flex-col items-center gap-10 w-full min-h-full">
                         {renderFlashcards()}
+                        <div className="flex flex-row justify-around w-[800px] mt-5">
+                            <Link
+                                to="/dashboard"
+                                className="px-10 py-3 rounded-md border bg-white text-black-200 font-bold duration-200  hover:scale-115 hover:bg-green-500 hover:border-green-500 active:scale-125 transition-all ease-in-out">
+                                Confirm
+                            </Link>
+                            <Link
+                                to="/"
+                                className="px-10 py-3 rounded-md bg-white font-bold transition-all ease-in-out duration-200 hover:scale-120 active:scale-125 hover:bg-red-500 hover:border-red-500">
+                                Go Back
+                            </Link>
+                        </div>
+
+
                     </div>
                 )}
         </motion.div>

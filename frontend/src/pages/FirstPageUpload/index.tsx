@@ -7,9 +7,15 @@ import { motion } from "motion/react"
 function FirstPageUpload() {
     return (
         <motion.div 
+           initial={{ scale: 0.3 }}
+            animate={{
+                scale: 1,
+                transition: {
+                    scale: { duration: 0.7, ease: "backOut" },
+                },
+            }}
             exit={{
                 opacity: 0,
-                backgroundColor: "#303030",
                 transition: {
                     opacity: { duration: 0.3, ease: "easeIn" }
                 }
