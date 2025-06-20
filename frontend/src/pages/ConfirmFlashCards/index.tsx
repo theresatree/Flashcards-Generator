@@ -61,7 +61,7 @@ function ConfirmFlashCards() {
             const isExpanded = expandedStacks.includes(i);
 
             return (
-                <div key={i} className="w-full max-w-[800px] mb-2">
+                <div key={i} className="ml-auto w-[850px] mb-6">
                     <h3
                         className="text-lg font-semibold mb-2 text-[#FEEEEE] cursor-pointer"
                         onClick={() => toggleStack(i)}
@@ -113,17 +113,19 @@ function ConfirmFlashCards() {
                     <div className="t-m mt-5">{progressText}</div>
                 </div>
             ) : (
-                    <div className="flex flex-col items-center gap-10 w-full min-h-full">
+                    <div className="flex flex-row items-center justify-center w-full min-h-screen">
+                        <div className="flex-col w-3/5 items-center justify-center min-w-[850px] pl-[50px]">
                         {renderFlashcards()}
-                        <div className="flex flex-row justify-around w-[800px] mt-5">
+                        </div>
+                        <div className="flex flex-col w-2/5 gap-10 sticky self-start top-1/2 items-center xl:pl-[50px] xl:mr-auto xl:items-start">
                             <Link
                                 to="/dashboard"
-                                className="px-10 py-3 rounded-md border bg-white text-black-200 font-bold duration-200  hover:scale-115 hover:bg-green-500 hover:border-green-500 active:scale-125 transition-all ease-in-out">
+                                className="max-w-[200px] px-10 py-3 rounded-md border bg-white text-black-200 font-bold duration-200  hover:scale-115 hover:bg-green-500 hover:border-green-500 active:scale-125 transition-all ease-in-out">
                                 Confirm
                             </Link>
                             <Link
                                 to="/"
-                                className="px-10 py-3 rounded-md bg-white font-bold transition-all ease-in-out duration-200 hover:scale-120 active:scale-125 hover:bg-red-500 hover:border-red-500">
+                                className="max-w-[200px] px-10 py-3 rounded-md bg-white font-bold transition-all ease-in-out duration-200 hover:scale-120 active:scale-125 hover:bg-red-500 hover:border-red-500">
                                 Go Back
                             </Link>
                         </div>

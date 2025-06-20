@@ -1,5 +1,4 @@
 import { Skeleton } from "../components/ui/skeleton"
-import { motion } from "motion/react"
 
 export function FlashcardSkeleton() {
     return (

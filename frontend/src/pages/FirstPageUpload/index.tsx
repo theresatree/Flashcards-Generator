@@ -1,10 +1,13 @@
 import Dropzone from "../../components/dropzone.tsx";
 import SplitText from "../../components/splitText.tsx";
+import DrawerShow from "../../components/drawer.tsx";
 
-import { Link } from "react-router-dom";
 import { motion } from "motion/react"
+import { useState } from "react";
 
 function FirstPageUpload() {
+    const [showDrawer, setShowDrawer] = useState(false)
+
     return (
         <motion.div 
            initial={{ scale: 0.3 }}
@@ -39,14 +42,17 @@ function FirstPageUpload() {
             </div>
             <div className="flex flex-col items-center justify-center text-sm mt-3 italic text-[#FEEEEE]">
                 <span>
-                    <Link to="/manual" className="underline text-[#ADD8E6]">Click here</Link> {" "}
+                    <button onClick={()=>setShowDrawer(true)} className="underline text-[#ADD8E6] cursor-pointer">Click here</button> {" "}
                     to manually create flashcards from your own LLM 
                 </span>
                 <span className="mt-5">
                     This flashcard generator will <span className="underline decoration-red-500">only be able to parse text</span> from documents
                 </span>
             </div>
-        </motion.div>
+
+            {/*This is to open drawer when button is clicked*/}
+             <DrawerShow open={showDrawer} onOpenChange={setShowDrawer} />
+          </motion.div>
     );
 }
 

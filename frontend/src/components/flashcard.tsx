@@ -4,6 +4,7 @@ import {
     CardHeader,
     CardTitle,
 } from "../components/ui/card";
+import { MarkdownRenderer } from "./markdownComponents";
 
 interface flashcardParams{
     questions: string,
@@ -17,8 +18,8 @@ function Flashcard(details: flashcardParams) {
                 <CardTitle className="text-sm italic font-semibold m-0 p-0">
                     {details.questions}
                 </CardTitle>
-                <CardContent className="text-sm text-[#ddd] pt-0">
-                    {details.answers}
+                <CardContent className="overflow-auto text-sm text-[#ddd] pt-0">
+                    <MarkdownRenderer content={details.answers} />
                 </CardContent>
             </CardHeader>
 

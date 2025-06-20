@@ -13,12 +13,24 @@ export async function generateFlashcards(projectID: string, flashcardLimit = 10)
 
         const prompt = `
 You are a helpful assistant.
+
 Please create exactly ${flashcardLimit} high-quality questions and concise answers
 based on the following text.
+
+- Use $...$ for inline math.
+- Use $$...$$ for block math.
+- If there is code, wrap it in triple backticks with the respective language, for example in python:
+
+\`\`\`python
+print("Hello World")
+\`\`\`
+
+Each pair of question and answer is split by an empty line.\n\n
 
 Format each pair clearly as:
 Q1: ...
 A1: ...
+
 Q2: ...
 A2: ...
 and so on.
@@ -35,6 +47,7 @@ ${combinedText}
 
         if (!response.ok) {
             console.error(await response.json());
+            toast.error("Failed to call LLM")
             throw new Error(`LLM call failed with status ${response.status}`);
         }
 
