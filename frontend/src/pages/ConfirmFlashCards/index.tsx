@@ -3,11 +3,8 @@ import { FlashcardSkeleton } from "../../components/skeletons";
 import { Progress } from "../../components/ui/progress";
 import { RAG } from "../../utils/RAG";
 import { toast } from "sonner";
-
-
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-
 import { useEffect, useRef, useState } from "react";
 import { retrieveAllFilesByProjectID } from "../../db_utils/retrieve_item";
 import { truncateFilename } from "../../utils/truncateString";
@@ -19,13 +16,14 @@ function ConfirmFlashCards() {
     const [loading, setLoading] = useState(true)
     const [mostRecentFiles, setMostRecentFiles] = useState<FileItem[]>([]);
     const [expandedStacks, setExpandedStacks] = useState<number[]>([]);
+    const [flashcardHeight, setFlashcardHeight] = useState(0); // Max height across all stacks
     const ran = useRef(false);
-    const MAX_FILE_LENGTH = 70;
+    const flashcardRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const MAX_FILE_LENGTH = 75;
 
     useEffect(() => {
-        if (ran.current) return; // ✅ already ran once
+        if (ran.current) return;
         ran.current = true;
-
         const run = async () => {
             try {
                 const mostRecentProjectID = await RAG((v, text) => {
@@ -44,11 +42,28 @@ function ConfirmFlashCards() {
                 toast.error("Error: " + (error instanceof Error ? error.message : String(error)));
             }
         };
-
         run();
     }, []);
 
+////////////////////////////////////////////THIS IS FOR FLASHCARDS//////////////////////////////////
 
+    // Find max height across all individual flashcards
+    useEffect(() => {
+        if (!loading && flashcardRefs.current.length > 0) {
+            let maxHeight = 0;
+            flashcardRefs.current.forEach((ref) => {
+                if (ref) {
+                    // Find all direct children (the StackedFlashCard components)
+                    const flashcardElements = ref.children;
+                    Array.from(flashcardElements).forEach((element) => {
+                        const height = (element as HTMLElement).offsetHeight;
+                        maxHeight = Math.max(maxHeight, height);
+                    });
+                }
+            });
+            setFlashcardHeight(maxHeight);
+        }
+    }, [loading, mostRecentFiles]);
 
     function toggleStack(index: number) {
         setExpandedStacks((prev) =>
@@ -59,17 +74,28 @@ function ConfirmFlashCards() {
     function renderFlashcards() {
         return mostRecentFiles.map((file, i) => {
             const isExpanded = expandedStacks.includes(i);
-
+            // Use the max flashcard height for margin
+            const stackMargin = isExpanded ? 0 : flashcardHeight + 50;
+            
             return (
-                <div key={i} className="ml-auto w-[850px] mb-6">
+                <div 
+                    key={i} 
+                    className="ml-auto w-[850px]"
+                    style={{ marginBottom: `${stackMargin}px` }}
+                >
                     <h3
                         className="text-lg font-semibold mb-2 text-[#FEEEEE] cursor-pointer"
                         onClick={() => toggleStack(i)}
                     >
                         {truncateFilename(file.filename, MAX_FILE_LENGTH)}
                     </h3>
-
-                    <div className="relative w-full min-h-[200px]">
+                    <div 
+                        className="relative w-full"
+ 
+                        ref={(el) => {
+                            flashcardRefs.current[i] = el;
+                        }}
+                    >
                         {file.flashcards.map((fc, j) => (
                             <StackedFlashCard
                               key={j}
@@ -85,6 +111,8 @@ function ConfirmFlashCards() {
             );
         });
     }
+
+////////////////////////////////////////////THIS IS FOR FLASHCARDS//////////////////////////////////
 
     return (
         <motion.div
@@ -129,14 +157,10 @@ function ConfirmFlashCards() {
                                 Go Back
                             </Link>
                         </div>
-
-
                     </div>
                 )}
         </motion.div>
     );
 }
 
-
 export default ConfirmFlashCards;
-

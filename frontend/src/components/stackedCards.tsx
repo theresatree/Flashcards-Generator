@@ -1,12 +1,9 @@
 import { motion } from "motion/react";
 import Flashcard from "./flashcard";
-
 import type { StackedFlashcardProps } from "../models/models";
-
 
 export function StackedFlashCard(props: StackedFlashcardProps) {
     const { question, answer, index, isExpanded, toggleStack } = props;
-
     return (
         <motion.div
             onClick={toggleStack}
@@ -32,10 +29,12 @@ export function StackedFlashCard(props: StackedFlashcardProps) {
                 ? "relative mb-4"
                 : "absolute top-0 left-0 w-full cursor-pointer"
                 }`}
-            style={{ zIndex: index }}
+            style={{ 
+                zIndex: index,
+            }}
+            data-flashcard // Add this data attribute for measurement
         >
             <Flashcard questions={question} answers={answer} />
         </motion.div>
     );
 }
-

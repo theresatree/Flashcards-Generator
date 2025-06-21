@@ -6,11 +6,11 @@ export interface Flashcard {
 }
 
 export interface StackedFlashcardProps {
-  question: string;
-  answer: string;
-  index: number; // j
-  isExpanded: boolean;
-  toggleStack: () => void;
+    question: string;
+    answer: string;
+    index: number; // j
+    isExpanded: boolean;
+    toggleStack: () => void;
 }
 
 export interface FileItem {
