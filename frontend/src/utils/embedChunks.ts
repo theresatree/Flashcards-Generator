@@ -1,15 +1,27 @@
-export async function EmbedChunks(text:string): Promise<number[]>{
-    const response = await fetch("http://127.0.0.1:8000/embedChunks",{
-        method: "POST",
-        headers: { "Content-Type": "application/json"},
-        body: JSON.stringify({text}),
-    });
+import { getHFApiKey } from "./LocalStorageCRUD";
 
-    if (!response.ok){
-        throw new Error(`Embedding Failed: ${response.statusText}`);
+export async function EmbedChunks(chunks: string[]) {
+    const hfKey = getHFApiKey()
+
+  const response = await fetch(
+    "https://api-inference.huggingface.co/models/BAAI/bge-small-en-v1.5",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${hfKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: chunks
+      }),
     }
-
-    const data = await response.json();
-    return data.embedding;
-
+  );
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+  }
+  
+  const result = await response.json();
+  return result;
 }

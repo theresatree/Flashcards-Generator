@@ -9,6 +9,7 @@ import { retrieveAllFilesByProjectID } from "../../db_utils/retrieve_item";
 import RenderFlashcards from "../../components/renderFlashcards";
 import type { FileItem } from "../../models/models";
 import { FlashcardContext } from "../../utils/FlashcardContext";
+import { removeItemByProjectID } from "../../db_utils/remove_item";
 
 function ConfirmFlashCards() {
     const [progressValue, setProgressValue] = useState(0);
@@ -42,6 +43,10 @@ function ConfirmFlashCards() {
         };
         run();
     }, []);
+
+    async function removeMostRecentProject(){
+       await removeItemByProjectID(mostRecentProjectID) 
+    }
 
 
     return (
@@ -83,14 +88,15 @@ function ConfirmFlashCards() {
                             </div>
                             <div className="flex flex-col w-2/5 gap-10 sticky self-start top-1/2 items-center xl:pl-[50px] xl:mr-auto xl:items-start">
                                 <Link
-                                    to="/dashboard"
-                                    className="max-w-[200px] px-10 py-3 rounded-md border bg-white text-black-200 font-bold duration-200  hover:scale-115 hover:bg-green-500 hover:border-green-500 active:scale-125 transition-all ease-in-out">
+                                    to="/"
+                                    className="flex justify-center min-w-[200px] px-10 py-3 rounded-md border bg-white text-black-200 font-bold duration-200 hover:scale-115 hover:bg-green-500 hover:border-green-500 active:scale-125 transition-all ease-in-out">
                                     Confirm
                                 </Link>
                                 <Link
                                     to="/"
-                                    className="max-w-[200px] px-10 py-3 rounded-md bg-white font-bold transition-all ease-in-out duration-200 hover:scale-120 active:scale-125 hover:bg-red-500 hover:border-red-500">
-                                    Go Back
+                                    onClick={async()=>removeMostRecentProject()}
+                                    className="flex justify-center min-w-[200px] px-10 py-3 rounded-md bg-white font-bold transition-all ease-in-out duration-200 hover:scale-115 active:scale-125 hover:bg-red-500 hover:border-red-500">
+                                    Go back 
                                 </Link>
                             </div>
                         </div>

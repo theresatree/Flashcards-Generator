@@ -25,30 +25,28 @@ export async function RAG(setProgress: (v:number, text:string) => void): Promise
         console.log("RAG: Files found:", Object.keys(data));
         setProgress(10, "Finished parsing files")
 
-        for (const filename in data) {
-            const chunks = TextToChunks(data[filename].text); // Step 2
 
-            // Make sure the update object exists for this filename
+        for (const filename in data) {
+            const chunks = TextToChunks(data[filename].text);
+
             updates[filename] = {
-                chunks: [],
+                chunks,
                 embeddings: []
             };
 
-            updates[filename].chunks = chunks;
-
-            // Then embed each chunk
-            for (let i = 0; i < chunks.length; i++) {
-                const chunk = chunks[i];
-                try {
-                    const embedding = await EmbedChunks(chunk);
-                    updates[filename].embeddings.push(embedding);
-                } catch (error) {
-                    throw error;
-                }
-
-            setProgress(20+Math.floor(((i/chunks.length)*50)), "Chunking and embedding files")
+            try {
+                const embeddings = await EmbedChunks(chunks);  // 🚀 batch request
+            console.log(embeddings)
+                updates[filename].embeddings = embeddings;
+            } catch (error) {
+                throw error;
             }
+
+            // ✅ You can update progress once per file, or per chunk if you want fancy bar.
+            setProgress(70, "Embedding files");
         }
+
+        
 
         await updateFileWithChunksAndEmbeddings(projectID, updates); // Step 4
         setProgress(70, "Updated details to database");

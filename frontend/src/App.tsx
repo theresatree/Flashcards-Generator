@@ -15,11 +15,11 @@ function AppRoutes() {
         <AnimatePresence mode="wait">
             <div className="fixed inset-0 bg-[#303030]">
                 <Routes location={location} key={location.pathname}>
-                    <Route path="/" element={<FirstPageUpload />} />
-                    <Route path="/confirmation" element={<ConfirmFlashCards />} />
                     <Route element ={<SidebarLayout />}>
-                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/" element={<Dashboard />} />
                     </Route>
+                    <Route path="/upload" element={<FirstPageUpload />} />
+                    <Route path="/confirmation" element={<ConfirmFlashCards />} />
                 </Routes>
             </div>
         </AnimatePresence>

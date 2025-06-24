@@ -1,8 +1,14 @@
 import { retrieveAllFilesByProjectID } from "../db_utils/retrieve_item";
 import { updateFile } from "../db_utils/update_item";
 import { toast } from "sonner";
+import { GoogleGenAI } from "@google/genai";
+import { getGeminiApiKey } from "./LocalStorageCRUD";
+
 
 export async function generateFlashcards(projectID: string, flashcardLimit = 10) {
+    const geminiKey = getGeminiApiKey();
+    const ai = new GoogleGenAI({ apiKey: `${geminiKey}`});
+
     const files = await retrieveAllFilesByProjectID(projectID);
 
     for (const file of files) {
@@ -39,21 +45,19 @@ TEXT:
 ${combinedText}
 `.trim();
 
-        const response = await fetch("http://127.0.0.1:8000/sendToLLM", {
-            method: "POST",
-            headers: {"Content-Type": "text/plain"},
-            body: JSON.stringify({contents: prompt}),
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: [prompt], 
         });
+        console.log(response.text);
 
-        if (!response.ok) {
-            console.error(await response.json());
+
+        if (!response || !response.text) {
             toast.error("Failed to call LLM")
-            throw new Error(`LLM call failed with status ${response.status}`);
+            throw new Error("LLM call failed");
         }
 
-        const data = await response.json();
-        console.log(data.text);
-        const content = data.text; 
+        const content = response.text;
 
         const regex = /Q\d+:\s*(.*?)\n+A\d+:\s*(.*?)(?=\n+Q\d+:|\n*$)/gs;
 
