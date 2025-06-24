@@ -38,14 +38,12 @@ and so on.
 `;
 
 
+type DrawerShowProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
 
-export default function DrawerShow({
-    open,
-    onOpenChange,
-}: {
-        open: boolean;
-        onOpenChange: (open: boolean) => void;
-    }) {
+export default function DrawerShow({ open, onOpenChange }: DrawerShowProps) {
 
     const [copied, setCopied] = useState(false);
 

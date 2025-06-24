@@ -6,6 +6,8 @@ export interface Flashcard {
 }
 
 export interface StackedFlashcardProps {
+    project_id: string;
+    filename: string;
     question: string;
     answer: string;
     index: number; // j

@@ -1,24 +1,23 @@
 import { motion } from "motion/react"
 
-
 function Dashboard() {
+
     return (
-        <motion.div             
+
+        <motion.div
             initial={{ scale: 0.3 }}
             animate={{
                 scale: 1,
-                transition: {
-                    scale: { duration: 0.7, ease: "backOut" },
-                },
+                transition: { scale: { duration: 0.7, ease: "backOut" } },
             }}
             exit={{
                 opacity: 0,
-                transition: {
-                    opacity: { duration: 0.3, ease: "easeIn" }
-                }
-            }}        >
-            Dashboard
+                transition: { opacity: { duration: 0.3, ease: "easeIn" } },
+            }}
+            className="p-10"
+        >
         </motion.div>
+
     );
 }
 

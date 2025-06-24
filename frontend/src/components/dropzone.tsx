@@ -56,9 +56,7 @@ function Dropzone() {
             const allSuccessful = results.every(result => result.success);
 
             if (allSuccessful) {
-                setTimeout(() => {
-                    navigate("/confirmation");
-                }, 1500);
+                navigate("/confirmation");
                 toast.success("Files successfully uploaded");
 
             } else {
