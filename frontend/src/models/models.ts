@@ -3,6 +3,7 @@
 export interface Flashcard {
     question: string
     answer: string
+    priority?: number
 }
 
 export interface StackedFlashcardProps {

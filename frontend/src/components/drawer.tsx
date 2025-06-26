@@ -6,12 +6,12 @@ import {
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-    DrawerTrigger,
 } from "../components/ui/drawer";
 import { Button } from "./ui/button";
 import { Clipboard } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { MarkdownRenderer } from "./markdownComponents";
 
 const instructionMarkdown = `You are a helpful assistant.
 

@@ -4,13 +4,16 @@ import { getGeminiApiKey, getHFApiKey } from "../../utils/LocalStorageCRUD";
 import { retrieveAllProjectIDs } from "../../db_utils/retrieve_item";
 import { SetupAPIGuide } from "../../components/setup_api_guide";
 import { Loader } from "lucide-react";
-import { warn } from "pdfjs-dist/types/src/shared/util";
+import { useSidebarState } from "../../utils/SidebarContext";
+import { Link } from "react-router-dom";
+
 
 function Dashboard() {
 {/*[0] - Gemini, [1] - HF*/}
     const[isAPISet, setIsAPISet] = useState<[boolean, boolean]>([false,false])
     const[anyProjectsAvail, setAnyProjectAvail] = useState(false)
     const[isLoading, setIsLoading] = useState(true)
+    const{selectedProjectID, selectedProjectDetails}=useSidebarState()
 
     useEffect(() => {
         const geminiKey = getGeminiApiKey(); // Note: "" = false
@@ -49,11 +52,23 @@ function Dashboard() {
             ) : isAPISet[0] && isAPISet[1] ? (
                     anyProjectsAvail ? (
                         <div>
-                            <p>Both API keys are set! Show your main content here.</p>
+                            <h3>{selectedProjectID}</h3>
+                            {(selectedProjectDetails[selectedProjectID]||[]).map((flashcard, index) => (
+                                <div key={index}>
+                                    {flashcard.question}
+                                </div>
+                            ))}
                         </div>
                     ) : (
-                            <div className="text-[#FEEEEE] text-3xl font-bold flex justify-center items-center">
-                                Please create a new project in settings
+                            <div className="flex justify-center items-center flex-col gap-7">
+                                <div className="text-[#FEEEEE] text-3xl font-bold flex justify-center items-center">
+                                    Please create a new project in settings
+                                </div>
+                                <Link
+                                    to="/upload"
+                                    className="bg-primary text-primary-foreground rounded-md px-10 py-3.5 hover:bg-stone-700 hover:scale-110 active:scale-120 active:bg-stone-500 transition-all ease-in-out">
+                                    Create Project
+                                </Link>
                             </div>
                         )
                 ) : (
