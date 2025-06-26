@@ -3,7 +3,7 @@ import { Button } from "./ui/button"
 
 export function SetupAPIGuide(){
     return(
-        <div className="text-[#FEEEEE] text-3xl font-bold gap-2 flex flex-col justify-center items-center">
+        <div className="text-[#FEEEEE] text-2xl font-bold gap-2 flex flex-col justify-center items-center">
             <p>Please set up both your</p>
             <p>Gemini & HF API keys to continue.</p>
             <div className="flex flex-row gap-10 mt-5">

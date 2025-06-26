@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     SidebarMenu,
     SidebarMenuButton,
@@ -19,72 +19,63 @@ import { DropdownMenu,
 } from "../../components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { truncateFilename } from "../../utils/truncateString";
-
 import type { FileItem } from "../../models/models";
 import { useSidebarState } from "../../utils/SidebarContext";
-
 
 type Props={
     projectIDs: string[],
     projectFilesMap: Record<string, FileItem[]>
 }
 
-
 export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
     const { setSelectedProjectDetails, setSelectedProjectID} = useSidebarState();
-    const [reversedFilename, setReversedFilename] = useState("")
-    const MAX_FILE_LENGTH = 20
+    const [reversedFilenames, setReversedFilenames] = useState<Record<string, string>>({});
+    const MAX_FILE_LENGTH = 20;
 
-    function getProjectFilesInJSX(projectID:string){
+    useEffect(() => {
+        const newReversedFilenames: Record<string, string> = {};
+        projectIDs.forEach(id => {
+            newReversedFilenames[id] = `${reverseProjectIDDate(id)} - ${reverseProjectIDTime(id)}`;
+        });
+        setReversedFilenames(newReversedFilenames);
+    }, [projectIDs]);
+    
+    function getProjectFilesInJSX(projectID: string){
         return (projectFilesMap[projectID] || []).map((file) => (
-            <SidebarMenuSubItem key={file.filename} className="text-sm italics text-stone-400">
-                <SidebarMenuButton onClick={()=>selectedItems(file.filename, [file])}>
-                    {truncateFilename(file.filename,MAX_FILE_LENGTH)}
+            <SidebarMenuSubItem key={file.filename} className="text-sm italic text-stone-400">
+                <SidebarMenuButton onClick={() => selectedItems(file.filename, [file])}>
+                    {truncateFilename(file.filename, MAX_FILE_LENGTH)}
                 </SidebarMenuButton>
             </SidebarMenuSubItem>
         ))
-
-    };
-
+    }
 
     function selectedItems(projectID: string, file: FileItem[]) {
-        const flashcards = file.flatMap(files => files.flashcards)
-
-        setSelectedProjectID(projectID)
+        const flashcards = file.flatMap(files => files.flashcards);
+        setSelectedProjectID(projectID);
         setSelectedProjectDetails({
             [projectID]: flashcards,
         });
     }
     
-    function reverseName(projectID:string){
-        setReversedFilename(`${reverseProjectIDDate(projectID)} - ${reverseProjectIDTime(projectID)}`)
-    }
-
-    return projectIDs.map((id)=>(
-        <SidebarMenu>
+    return projectIDs.map((id) => (
+        <SidebarMenu key={id}>
             <Collapsible className="group/collapsible">
-                <SidebarMenuItem key={id}>
+                <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-
-                        {/* Contents of the title.*/}
                         <SidebarMenuButton asChild>
-                            <button 
-                                className="justify-between flex p-3 my-1"
-                                onClick={()=>reverseName(id)}
-                            >
-                                <div>{reversedFilename}</div>
+                            <button className="justify-between flex p-3 my-1 w-full text-left">
+                                <div>{reversedFilenames[id] || 'Loading...'}</div>
                             </button>
                         </SidebarMenuButton>
                     </CollapsibleTrigger>
-
-                    {/* Contents of the collapsible*/}
+                    
                     <CollapsibleContent>
                         <SidebarMenuSub>
                             {getProjectFilesInJSX(id)}
                         </SidebarMenuSub>
                     </CollapsibleContent>
-
-                    {/* This is for dropdownMenu*/}
+                    
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <SidebarMenuAction>
@@ -97,10 +88,12 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
-                                <DropdownMenuItem className="mb-1"                                 
+                                <DropdownMenuItem 
+                                    className="mb-1"                                 
                                     onClick={() => {
-                                        selectedItems(reversedFilename, projectFilesMap[id]);
-                                    }}>
+                                        selectedItems(id, projectFilesMap[id] || []);
+                                    }}
+                                >
                                     Test all from this project
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="mb-1">
@@ -115,13 +108,8 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                             </DropdownMenuGroup>
                         </DropdownMenuContent>
                     </DropdownMenu>
-
-
                 </SidebarMenuItem>
             </Collapsible>
         </SidebarMenu>
     ));
-
 }
-
-

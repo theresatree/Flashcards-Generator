@@ -70,7 +70,7 @@ function ConfirmFlashCards() {
                         opacity: { duration: 0.3, ease: "easeIn" }
                     }
                 }}
-                className="fixed inset-0 overflow-auto p-6"
+                className="fixed inset-0 overflow-auto pt-6"
             >
                 {loading ? (
                     <div className="flex flex-col items-center justify-center text-[#FEEEEE] min-h-full">

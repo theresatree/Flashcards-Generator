@@ -4,8 +4,8 @@ import { getGeminiApiKey, getHFApiKey } from "../../utils/LocalStorageCRUD";
 import { retrieveAllProjectIDs } from "../../db_utils/retrieve_item";
 import { SetupAPIGuide } from "../../components/setup_api_guide";
 import { Loader } from "lucide-react";
-import { useSidebarState } from "../../utils/SidebarContext";
 import { Link } from "react-router-dom";
+import { DashboardFlashcard } from "../../components/dashboard/dashboardFlashcard";
 
 
 function Dashboard() {
@@ -13,7 +13,6 @@ function Dashboard() {
     const[isAPISet, setIsAPISet] = useState<[boolean, boolean]>([false,false])
     const[anyProjectsAvail, setAnyProjectAvail] = useState(false)
     const[isLoading, setIsLoading] = useState(true)
-    const{selectedProjectID, selectedProjectDetails}=useSidebarState()
 
     useEffect(() => {
         const geminiKey = getGeminiApiKey(); // Note: "" = false
@@ -51,17 +50,10 @@ function Dashboard() {
                 </div>
             ) : isAPISet[0] && isAPISet[1] ? (
                     anyProjectsAvail ? (
-                        <div>
-                            <h3>{selectedProjectID}</h3>
-                            {(selectedProjectDetails[selectedProjectID]||[]).map((flashcard, index) => (
-                                <div key={index}>
-                                    {flashcard.question}
-                                </div>
-                            ))}
-                        </div>
+                    <DashboardFlashcard />
                     ) : (
                             <div className="flex justify-center items-center flex-col gap-7">
-                                <div className="text-[#FEEEEE] text-3xl font-bold flex justify-center items-center">
+                                <div className="text-[#FEEEEE] text-2xl font-bold flex justify-center items-center">
                                     Please create a new project in settings
                                 </div>
                                 <Link
