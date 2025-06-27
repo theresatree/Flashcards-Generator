@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { motion } from "motion/react";
 import RenderFlashcards from "../renderFlashcards";
@@ -65,4 +65,5 @@ function EditFlashcardsInProjects(){
 }
 
 export default EditFlashcardsInProjects;
+
 
