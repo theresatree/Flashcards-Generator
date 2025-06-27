@@ -5,7 +5,7 @@ import { retrieveAllProjectIDs } from "../../db_utils/retrieve_item";
 import { SetupAPIGuide } from "../../components/setup_api_guide";
 import { Loader } from "lucide-react";
 import { Link } from "react-router-dom";
-import { DashboardFlashcard } from "../../components/dashboard/dashboardFlashcard";
+import { DashboardContent } from "../../components/dashboard/dashboardContent";
 
 
 function Dashboard() {
@@ -27,9 +27,17 @@ function Dashboard() {
         getProjects();
     }, []);
 
+    if (isLoading){
+        return (
+            <div className="flex flex-col items-center justify-center text-[#FEEEEE]">
+                <Loader className="h-10 w-10 animate-spin mb-4" />
+                <p>Loading Information...</p>
+            </div>
+        );
+
+    }
 
     return (
-
         <motion.div
             initial={{ scale: 0.3 }}
             animate={{
@@ -40,32 +48,26 @@ function Dashboard() {
                 opacity: 0,
                 transition: { opacity: { duration: 0.3, ease: "easeIn" } },
             }}
-            className="flex justify-center items-center w-full h-screen p-10"
-        >
+            className="flex justify-center items-center w-full h-screen">
             {/* Show Main Content*/}
-            {isLoading ? (
-                <div className="flex flex-col items-center justify-center text-[#FEEEEE]">
-                    <Loader className="h-10 w-10 animate-spin mb-4" />
-                    <p>Loading Information...</p>
-                </div>
-            ) : isAPISet[0] && isAPISet[1] ? (
-                    anyProjectsAvail ? (
-                    <DashboardFlashcard />
-                    ) : (
-                            <div className="flex justify-center items-center flex-col gap-7">
-                                <div className="text-[#FEEEEE] text-2xl font-bold flex justify-center items-center">
-                                    Please create a new project in settings
-                                </div>
-                                <Link
-                                    to="/upload"
-                                    className="bg-primary text-primary-foreground rounded-md px-10 py-3.5 hover:bg-stone-700 hover:scale-110 active:scale-120 active:bg-stone-500 transition-all ease-in-out">
-                                    Create Project
-                                </Link>
-                            </div>
-                        )
+            { isAPISet[0] && isAPISet[1] ? (
+                anyProjectsAvail ? (
+                    <DashboardContent />
                 ) : (
-                        <SetupAPIGuide />
-                    )}
+                        <div className="flex justify-center items-center flex-col gap-7 p-10">
+                            <div className="text-[#FEEEEE] text-2xl font-bold flex justify-center items-center">
+                                Please create a new project in settings
+                            </div>
+                            <Link
+                                to="/upload"
+                                className="bg-primary text-primary-foreground rounded-md px-10 py-3.5 hover:bg-stone-700 hover:scale-110 active:scale-120 active:bg-stone-500 transition-all ease-in-out">
+                                Create Project
+                            </Link>
+                        </div>
+                    )
+            ) : (
+                    <SetupAPIGuide />
+                )}
         </motion.div>
 
     );

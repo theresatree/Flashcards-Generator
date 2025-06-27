@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { ImCross } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
@@ -9,18 +9,37 @@ import { addItemWithKey } from '../db_utils/add_item';
 import { getFileIcon } from '../utils/getFileIcon';
 import { truncateFilename } from '../utils/truncateString';
 import { generateProjectId } from '../utils/generateProjectID';
+import { NumberSelect } from '../utils/selectNumber';
+import { retrieveAllFilesByProjectID } from '../db_utils/retrieve_item';
 
 const MAX_FILE_NAME_LENGTH = 30;
 const MAX_FILE_SIZE = 40;
 
 /////////////////////////////////////////////////////
 
-function Dropzone() {
+type Props={
+    projectID?: string,
+}
+
+function Dropzone({projectID}: Props) {
     const navigate = useNavigate();
     const [allFiles, setAllFiles] = useState<File[]>([]);
+    const DEFAULT_FLASHCARDS = 10;
+
+
+    const [flashcardCounts, setFlashcardCounts] = useState<number[]>([]);
+    useEffect(() => {
+        setFlashcardCounts(allFiles.map(() => DEFAULT_FLASHCARDS));
+    }, [allFiles.length]);
+
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         setAllFiles(prev => [...prev, ...acceptedFiles]);
+
+        setFlashcardCounts(prevCounts => [
+            ...prevCounts,
+            ...Array(acceptedFiles.length).fill(DEFAULT_FLASHCARDS),
+        ]);
 
         acceptedFiles.forEach((file) => {
             const reader = new FileReader();
@@ -32,33 +51,50 @@ function Dropzone() {
     }, []);
 
 
-    const processFiles = async () => {
-        const projectID = generateProjectId() 
+        const processFiles = async (): Promise<{ pid: string, uploadedFiles: string[] } | null> => {
+        const pid = projectID ?? generateProjectId();
+        const existingItems = await retrieveAllFilesByProjectID(pid);
+        const existingFilenames = new Set(existingItems.map(file => file.filename));
+
+        const uploadedFiles: string[] = [];
+
         try {
             const results = await Promise.all(
-                allFiles.map(async (file) => {
+                allFiles.map(async (file, i) => {
+                    if (existingFilenames.has(file.name)) {
+                        console.log(`Skipping ${file.name} (already exists)`);
+                        return { success: true };
+                    }
+
                     const item: FileItem = {
-                        project_id: projectID,
+                        project_id: pid,
                         filename: file.name,
                         file_size: file.size,
                         file: file,
                         flashcards: [],
                         chunks: [],
                         embeddings: [],
+                        no_of_flashcards: flashcardCounts[i]
                     };
 
                     await addItemWithKey(item);
+                    uploadedFiles.push(file.name);
                     return { success: true };
-
                 })
             );
+
 
             const allSuccessful = results.every(result => result.success);
 
             if (allSuccessful) {
-                navigate("/confirmation");
+                navigate("/confirmation", {
+                    state: {
+                        projectID: pid,
+                        uploadedFiles
+                    }
+                });
                 toast.success("Files successfully uploaded");
-
+                return { pid, uploadedFiles };
             } else {
                 toast.error("Some files failed to upload");
             }
@@ -102,7 +138,18 @@ function Dropzone() {
                 {getFileIcon(file)}
                 <span>{truncateFilename(file.name, MAX_FILE_NAME_LENGTH)}</span>
             </div>
-            <span>{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
+                <span className="ml-auto mr-2">{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
+            <NumberSelect
+                value={flashcardCounts[i]}
+                onChange={(val) => {
+                    // update only this index
+                    setFlashcardCounts((prev) => {
+                        const next = [...prev];
+                        next[i] = val;
+                        return next;
+                    });
+                }}
+            />
         </li>
     ));
 
@@ -123,6 +170,8 @@ function Dropzone() {
 
     return (
         <section className="container">
+            {projectID && 
+            <h3 className="mb-3">Project ID: {projectID}</h3>}
             <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-md px-6 py-10 mt-1 transition-colors duration-200
@@ -145,6 +194,7 @@ text-gray-600 text-sm`}
                             Process Files 
                         </button>
                         <ul className="text-sm text-gray-700 list-disc list-inside">{files}</ul>
+
                     </>
                 )}
 

@@ -18,7 +18,7 @@ function AppRoutes() {
                     <Route element ={<SidebarLayout />}>
                         <Route path="/" element={<Dashboard />} />
                     </Route>
-                    <Route path="/upload" element={<FirstPageUpload />} />
+                    <Route path="/upload/:projectID?" element={<FirstPageUpload />} />
                     <Route path="/confirmation" element={<ConfirmFlashCards />} />
                 </Routes>
             </div>

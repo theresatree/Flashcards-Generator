@@ -21,6 +21,9 @@ import { MoreHorizontal } from "lucide-react";
 import { truncateFilename } from "../../utils/truncateString";
 import type { FileItem } from "../../models/models";
 import { useSidebarState } from "../../utils/SidebarContext";
+import { removeItemByProjectID } from "../../db_utils/remove_item";
+import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 type Props={
     projectIDs: string[],
@@ -28,9 +31,9 @@ type Props={
 }
 
 export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
-    const { setSelectedProjectDetails, setSelectedProjectID} = useSidebarState();
+    const {setSelectedProjectDetails, setSelectedProjectID} = useSidebarState();
     const [reversedFilenames, setReversedFilenames] = useState<Record<string, string>>({});
-    const MAX_FILE_LENGTH = 20;
+    const MAX_FILE_LENGTH = 15;
 
     useEffect(() => {
         const newReversedFilenames: Record<string, string> = {};
@@ -39,7 +42,7 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
         });
         setReversedFilenames(newReversedFilenames);
     }, [projectIDs]);
-    
+
     function getProjectFilesInJSX(projectID: string){
         return (projectFilesMap[projectID] || []).map((file) => (
             <SidebarMenuSubItem key={file.filename} className="text-sm italic text-stone-400">
@@ -57,7 +60,7 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
             [projectID]: flashcards,
         });
     }
-    
+
     return projectIDs.map((id) => (
         <SidebarMenu key={id}>
             <Collapsible className="group/collapsible">
@@ -69,13 +72,13 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                             </button>
                         </SidebarMenuButton>
                     </CollapsibleTrigger>
-                    
+
                     <CollapsibleContent>
                         <SidebarMenuSub>
                             {getProjectFilesInJSX(id)}
                         </SidebarMenuSub>
                     </CollapsibleContent>
-                    
+
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <SidebarMenuAction>
@@ -96,13 +99,19 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                                 >
                                     Test all from this project
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="mb-1">
-                                    Add files
+                                <DropdownMenuItem 
+                                    className="mb-1">
+                                    <Link to={`/upload/${id}`}>Add files</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="mb-1">
                                     Edit flashcards
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        toast.success("Project successfully deleted")
+                                        setTimeout(()=>{
+                                            removeItemByProjectID(id)
+                                            window.location.reload()},1000)}}>
                                     Delete Project 
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>

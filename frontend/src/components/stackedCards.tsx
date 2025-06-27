@@ -42,7 +42,7 @@ isExpanded
             }}
         >
             {isExpanded &&  (<div>
-                <Button className="absolute top-1 right-11 cursor-pointer z-10 size-6.5 hover:scale-110 active:scale-120" 
+                <Button className="absolute top-[0.2rem] right-[3.4rem] cursor-pointer z-10 size-6.5 hover:scale-110 active:scale-120" 
                     size="icon" 
                     onClick={(e) => {
                         e.stopPropagation(); // To prevent clicking of flashcards

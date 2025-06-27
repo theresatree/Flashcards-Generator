@@ -24,6 +24,7 @@ export interface FileItem {
     flashcards: Flashcard[];
     chunks: string[]
     embeddings: number[][]
+    no_of_flashcards: number
 }
 
 export interface ProjectFilesDict {

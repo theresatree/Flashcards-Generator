@@ -5,7 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import { getGeminiApiKey } from "./LocalStorageCRUD";
 
 
-export async function generateFlashcards(projectID: string, flashcardLimit = 10) {
+export async function generateFlashcards(projectID: string) {
     const geminiKey = getGeminiApiKey();
     const ai = new GoogleGenAI({ apiKey: `${geminiKey}`});
 
@@ -13,35 +13,42 @@ export async function generateFlashcards(projectID: string, flashcardLimit = 10)
 
     for (const file of files) {
         if (!file.chunks) continue;
+        if (file.flashcards && file.flashcards.length > 0) {
+            console.log(`Skipping flashcard generation for: ${file.filename} (already has ${file.flashcards.length} cards)`);
+            continue;
+        }
 
         // ✅ Combine ALL chunks for maximum context
         const combinedText = file.chunks.join("\n\n---\n\n");
+        const flashcardLimit = file.no_of_flashcards
 
         const prompt = `
 You are a helpful assistant.
 
-Please create exactly ${flashcardLimit} high-quality questions and concise answers
-based on the following text.
+Your task is to generate exactly ${flashcardLimit} high-quality question-and-answer pairs based on the provided text.
 
-- Use $...$ for inline math.
-- Use $$...$$ for block math.
-- If there is code, wrap it in triple backticks with the respective language, for example in python:
+**Formatting Rules:**
+- Each question should be clearly labeled: Q1, Q2, etc.
+- Each answer should follow immediately, labeled A1, A2, etc.
+- Insert a **blank line** between each Q&A pair.
+- Use **line breaks** and **indentation** to make the output human-readable.
+- For inline math, use: \`$...$\`
+- For block math, use: \`$$...$$\`
+- For code snippets, wrap them in triple backticks with the language.
 
 \`\`\`python
 print("Hello World")
 \`\`\`
 
-Each pair of question and answer is split by an empty line.\n\n
+Format your output exactly as:
 
-Format each pair clearly as:
-Q1: ...
-A1: ...
+Q1: …
+A1: …
 
-Q2: ...
-A2: ...
-and so on.
+Q2: …
+A2: …
 
-TEXT:
+**TEXT TO USE**:
 ${combinedText}
 `.trim();
 

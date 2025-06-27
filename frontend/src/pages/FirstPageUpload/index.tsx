@@ -4,9 +4,13 @@ import DrawerShow from "../../components/drawer.tsx";
 
 import { motion } from "motion/react"
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+
 
 function FirstPageUpload() {
     const [showDrawer, setShowDrawer] = useState(false)
+      const { projectID } = useParams<{ projectID?: string }>();
+
 
     return (
         <motion.div 
@@ -38,7 +42,7 @@ function FirstPageUpload() {
                 textAlign="center"
             />
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xl text-center">
-                <Dropzone />
+                <Dropzone projectID={projectID}/>
             </div>
             <div className="flex flex-col items-center justify-center text-sm mt-3 italic text-[#FEEEEE]">
                 <span>

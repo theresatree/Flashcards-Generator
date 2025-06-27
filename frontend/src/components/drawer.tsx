@@ -11,32 +11,31 @@ import { Button } from "./ui/button";
 import { Clipboard } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { MarkdownRenderer } from "./markdownComponents";
 
-const instructionMarkdown = `You are a helpful assistant.
+const instructionMarkdown = 
+`You are a helpful assistant.
 
-Please create 10 questions and concise answers
-based on the following text.
+Your task is to generate exactly [flashcardLimit] high-quality question-and-answer pairs based on the provided text.
 
-- Use \`$...$\` for inline math.
-- Use \`$$...$$\` for block math.
-- If there is code, wrap it in triple backticks with the respective language, for example:
-
+**Formatting Rules:**
+- Each question should be clearly labeled: **Q1**, **Q2**, etc.
+- Each answer should follow immediately, labeled **A1**, **A2**, etc.
+- Insert a **blank line** between each Q&A pair.
+- Use **line breaks** and **indentation** to make the output human-readable.
+- For inline math, use: \`$...$\`
+- For block math, use: \`$$...$$\`
+- For code snippets, wrap them in triple backticks with the language.
 \`\`\`python
 print("Hello World")
 \`\`\`
+Format your output exactly as:
 
-Each pair of question and answer is split by an empty line.
+Q1: …
+A1: …
 
-Format each pair clearly as:
-Q1: ...
-A1: ...
-
-Q2: ...
-A2: ...
-and so on.
+Q2: …
+A2: …
 `;
-
 
 type DrawerShowProps = {
   open: boolean;
