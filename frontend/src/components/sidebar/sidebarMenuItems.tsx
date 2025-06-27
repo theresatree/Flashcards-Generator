@@ -21,8 +21,8 @@ import { MoreHorizontal } from "lucide-react";
 import { truncateFilename } from "../../utils/truncateString";
 import type { FileItem } from "../../models/models";
 import { useSidebarState } from "../../utils/SidebarContext";
-import { removeItemByProjectID } from "../../db_utils/remove_item";
-import { toast } from "sonner";
+import { DeleteDialog } from "./confirmDeleteDialog";
+import { DeleteFileDialog } from "./deleteFileDialog";
 import { Link } from "react-router-dom";
 
 type Props={
@@ -33,6 +33,8 @@ type Props={
 export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
     const {setSelectedProjectDetails, setSelectedProjectID} = useSidebarState();
     const [reversedFilenames, setReversedFilenames] = useState<Record<string, string>>({});
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+    const [openDeleteFileDialog, setOpenDeleteFileDialog] = useState(false)
     const MAX_FILE_LENGTH = 15;
 
     useEffect(() => {
@@ -99,19 +101,31 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                                 >
                                     Test all from this project
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator className=""/>
                                 <DropdownMenuItem 
                                     className="mb-1">
-                                    <Link to={`/upload/${id}`}>Add files</Link>
+                                    <Link 
+                                        className="w-full"
+                                        to="/edit" 
+                                        state={{ project_id: id, projectFiles: projectFilesMap[id] }}
+                                    >
+                                        Edit flashcards
+                                    </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="mb-1">
-                                    Edit flashcards
+                                <DropdownMenuItem 
+                                    className="mb-1">
+                                    <Link 
+                                        className="w-full"
+                                        to={`/upload/${id}`}>Add file</Link>
                                 </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    onClick={()=>setOpenDeleteFileDialog(true)}
+                                    className="mb-1">
+                                    Delete File
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem
-                                    onClick={() => {
-                                        toast.success("Project successfully deleted")
-                                        setTimeout(()=>{
-                                            removeItemByProjectID(id)
-                                            window.location.reload()},1000)}}>
+                                    onClick={() => {setOpenDeleteDialog(true)}}>
                                     Delete Project 
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
@@ -119,6 +133,14 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                     </DropdownMenu>
                 </SidebarMenuItem>
             </Collapsible>
+
+            {/*This is for the Dialog to delete.*/}
+            <DeleteDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog} project_id={id}/>
+            <DeleteFileDialog 
+                open={openDeleteFileDialog}
+                onOpenChange={setOpenDeleteFileDialog}
+                project_id={id}
+                files={projectFilesMap[id] || []}/>
         </SidebarMenu>
     ));
 }

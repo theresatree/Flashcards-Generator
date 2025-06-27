@@ -4,6 +4,7 @@ import { AnimatePresence } from "motion/react";
 import FirstPageUpload from "./pages/FirstPageUpload";
 import ConfirmFlashCards from "./pages/ConfirmFlashCards";
 import Dashboard from "./pages/Dashboard";  
+import EditFlashCardsInProjects from "./components/sidebar/editFlashCardInProjects.tsx";
 import { Toaster } from "./components/ui/sonner";
 import { SidebarLayout } from "./utils/SidebarLayout";
 
@@ -20,6 +21,7 @@ function AppRoutes() {
                     </Route>
                     <Route path="/upload/:projectID?" element={<FirstPageUpload />} />
                     <Route path="/confirmation" element={<ConfirmFlashCards />} />
+                    <Route path="/edit" element={<EditFlashCardsInProjects />} />
                 </Routes>
             </div>
         </AnimatePresence>

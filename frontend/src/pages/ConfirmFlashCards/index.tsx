@@ -24,38 +24,38 @@ function ConfirmFlashCards() {
     const uploadedFilenames = useRef<Set<string>>(new Set(location.state?.uploadedFiles || []));
 
 
-  useEffect(() => {
-    if (ran.current) return;
-    ran.current = true;
+    useEffect(() => {
+        if (ran.current) return;
+        ran.current = true;
 
-    const run = async () => {
-        try {
-            const projectID = await RAG((v, text) => {
-                setProgressValue(v);
-                setProgressText(text);
-            });
+        const run = async () => {
+            try {
+                const projectID = await RAG((v, text) => {
+                    setProgressValue(v);
+                    setProgressText(text);
+                });
 
-            if (projectID) {
-                const files = await retrieveAllFilesByProjectID(projectID);
-                const filtered = files.filter(file =>
-                    uploadedFilenames.current.has(file.filename)
-                );
+                if (projectID) {
+                    const files = await retrieveAllFilesByProjectID(projectID);
+                    const filtered = files.filter(file =>
+                        uploadedFilenames.current.has(file.filename)
+                    );
 
-                setMostRecentProjectID(projectID);
-                setMostRecentFiles(filtered);
-                setLoading(false);
-            } else {
-                toast.error("Error generating flashcard. Please restart");
+                    setMostRecentProjectID(projectID);
+                    setMostRecentFiles(filtered);
+                    setLoading(false);
+                } else {
+                    toast.error("Error generating flashcard. Please restart");
+                }
+            } catch (error) {
+                console.error("Caught RAG error:", error);
+                toast.error("Error: " + (error instanceof Error ? error.message : String(error)));
             }
-        } catch (error) {
-            console.error("Caught RAG error:", error);
-            toast.error("Error: " + (error instanceof Error ? error.message : String(error)));
-        }
-    };
+        };
 
-    run();
-}, []);
-// Handle all types of navigation away from the page
+        run();
+    }, []);
+    // Handle all types of navigation away from the page
     useEffect(() => {
         const deleteProject = async () => {
             if (!userConfirmed.current && mostRecentProjectID) {
@@ -74,7 +74,7 @@ function ConfirmFlashCards() {
         };
 
         window.addEventListener("popstate", handlePopState);
-        
+
         return () => {
             window.removeEventListener("popstate", handlePopState);
         };

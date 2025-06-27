@@ -32,8 +32,8 @@ Your task is to generate exactly ${flashcardLimit} high-quality question-and-ans
 - Each answer should follow immediately, labeled A1, A2, etc.
 - Insert a **blank line** between each Q&A pair.
 - Use **line breaks** and **indentation** to make the output human-readable.
-- For inline math, use: \`$...$\`
-- For block math, use: \`$$...$$\`
+- For inline math, use: $...$
+- For block math, use: $$...$$
 - For code snippets, wrap them in triple backticks with the language.
 
 \`\`\`python
