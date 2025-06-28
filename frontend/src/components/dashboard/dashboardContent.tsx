@@ -4,13 +4,14 @@ import { MarkdownRenderer } from "../markdownComponents";
 import { DashboardFlashcard } from "./dashboardFlashcard";
 import { motion  } from "motion/react";  
 import { reverseProjectIDTime, reverseProjectIDDate } from "../../utils/reverseProjectID";
+import { updateFlashcardPriorityInAFile, updateFlashcardPriorityInAProject } from "../../db_utils/update_item";     
 
 export function DashboardContent() {
-    const { selectedProjectID, selectedProjectDetails } = useSidebarState();
+    const { selectedProjectID, selectedProjectDetails, selectedFileName } = useSidebarState();
     const [currentQuestionCounter, setCurrentQuestionCounter] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
     const [endOfQuestion, setEndOfQuestion] = useState(false)
-    const flashcards = selectedProjectDetails[selectedProjectID] || [];
+    const flashcards = selectedFileName ? selectedProjectDetails[selectedFileName] : selectedProjectDetails[selectedProjectID] || [];
     const answerRef = useRef<HTMLDivElement>(null);
     const [answerHeight, setAnswerHeight] = useState(0);
 
@@ -34,7 +35,7 @@ export function DashboardContent() {
         setCurrentQuestionCounter(0);
         setEndOfQuestion(false);
         setShowAnswer(false);
-    }, [selectedProjectID]);
+    }, [selectedProjectID, selectedFileName]);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -66,8 +67,14 @@ export function DashboardContent() {
                     });
                 }
                 setShowAnswer(false);
-            } 
-        }
+            } else if (e.code === "Digit1" || e.code === "Digit2" || e.code === "Digit3" || e.code === "Digit4" || e.code === "Digit5") {
+                const priority = parseInt(e.code.replace("Digit", ""), 10);
+
+                // Test for if merged.
+                setCurrentQuestionCounter(priority - 1);
+                setShowAnswer(false);
+                setEndOfQuestion(false);
+}        }
 
         document.addEventListener('keydown', handleGlobalKeyDown);
         return () => {
@@ -94,9 +101,10 @@ export function DashboardContent() {
     return (
         <div className="flex flex-col text-[#FEEEEE] px-10 pb-10 size-full" tabIndex={0}>
             <h3 className="right-1 text-xl font-semibold ml-auto">
-                {/^\d{14}$/.test(selectedProjectID)
-                    ? `${reverseProjectIDDate(selectedProjectID)} - ${reverseProjectIDTime(selectedProjectID)}`
-                    : selectedProjectID}
+                {selectedFileName 
+              ? selectedFileName
+             : `${reverseProjectIDDate(selectedProjectID)} - ${reverseProjectIDTime(selectedProjectID)}`}
+
             </h3>
             {endOfQuestion ? 
                 <div className="flex flex-col justify-center items-center max-w-[1000px] my-auto w-full mx-auto font-bold text-2xl">

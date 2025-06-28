@@ -31,7 +31,7 @@ type Props={
 }
 
 export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
-    const {setSelectedProjectDetails, setSelectedProjectID} = useSidebarState();
+    const {setSelectedProjectDetails, setSelectedProjectID, setSelectedFileName} = useSidebarState();
     const [reversedFilenames, setReversedFilenames] = useState<Record<string, string>>({});
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
     const [openDeleteFileDialog, setOpenDeleteFileDialog] = useState(false)
@@ -48,19 +48,28 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
     function getProjectFilesInJSX(projectID: string){
         return (projectFilesMap[projectID] || []).map((file) => (
             <SidebarMenuSubItem key={file.filename} className="text-sm italic text-stone-400">
-                <SidebarMenuButton onClick={() => selectedItems(file.filename, [file])}>
+                <SidebarMenuButton onClick={() => selectedItems([file], projectID, file.filename)}>
                     {truncateFilename(file.filename, MAX_FILE_LENGTH)}
                 </SidebarMenuButton>
             </SidebarMenuSubItem>
         ))
     }
 
-    function selectedItems(projectID: string, file: FileItem[]) {
+    function selectedItems(file: FileItem[], projectID: string, fileName?:string) {
         const flashcards = file.flatMap(files => files.flashcards);
         setSelectedProjectID(projectID);
-        setSelectedProjectDetails({
-            [projectID]: flashcards,
-        });
+
+        if (!fileName){
+            setSelectedProjectDetails({
+                [projectID]: flashcards,
+            });
+            setSelectedFileName("")
+        } else {
+            setSelectedFileName(fileName);
+            setSelectedProjectDetails({
+                [fileName]: flashcards,
+            });
+        }
     }
 
     return projectIDs.map((id) => (
@@ -96,7 +105,7 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                                 <DropdownMenuItem 
                                     className="mb-1"                                 
                                     onClick={() => {
-                                        selectedItems(id, projectFilesMap[id] || []);
+                                        selectedItems(projectFilesMap[id] || [], id);
                                     }}
                                 >
                                     Test all from this project

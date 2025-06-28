@@ -5,6 +5,8 @@ import type { Flashcard } from "../models/models";
 type SidebarStateContextType = {
     selectedProjectID: string;
     setSelectedProjectID: (projectID:string) => void;
+    selectedFileName: string;
+    setSelectedFileName: (fileName:string) =>void;
     selectedProjectDetails: Record<string,Flashcard[]>;
     setSelectedProjectDetails: (details: Record<string, Flashcard[]>) => void;
 };
@@ -14,9 +16,10 @@ const SidebarStateContext = createContext<SidebarStateContextType | undefined>(u
 export function SidebarStateContextProvider({ children }: { children: ReactNode }) {
     const [selectedProjectID, setSelectedProjectID] = useState("")
     const [selectedProjectDetails, setSelectedProjectDetails] = useState<Record<string, Flashcard[]>>({});
+    const [selectedFileName, setSelectedFileName] = useState("")
 
     return (
-        <SidebarStateContext.Provider value={{ selectedProjectID, setSelectedProjectID, selectedProjectDetails, setSelectedProjectDetails}}>
+        <SidebarStateContext.Provider value={{ selectedProjectID, setSelectedProjectID, selectedProjectDetails, setSelectedProjectDetails, selectedFileName, setSelectedFileName}}>
             {children}
         </SidebarStateContext.Provider>
     );

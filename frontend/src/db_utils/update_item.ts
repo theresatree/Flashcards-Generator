@@ -73,3 +73,86 @@ export async function updateFlashcard(projectID: string, filename:string, index:
         };
     });
 }
+
+
+export async function updateFlashcardPriorityInAFile(projectID: string, filename:string, index:number, priority: number): Promise<void> {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+
+    const indexObj = store.index(INDEX); 
+    const request = indexObj.openCursor(IDBKeyRange.only(projectID));
+
+    return new Promise((resolve, reject) => {
+        request.onerror = () => reject(request.error);
+        request.onsuccess = (event) => {
+            const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+
+            if (cursor) {
+                const file = cursor.value as FileItem;
+                if (file.filename === filename) {
+                    if (!file.flashcards || !file.flashcards[index]) {
+                        reject(new Error("Flashcard index out of range"));
+                        return;
+                    }
+
+                    file.flashcards[index].priority = priority;
+
+                    cursor.update(file);
+                    resolve();
+                    return;
+                }
+                cursor.continue();
+            } else {
+                // If we exhausted the cursor with no match
+                reject(new Error("FileItem not found"));
+            }
+        };
+    });
+}
+
+
+export async function updateFlashcardPriorityInAProject(
+  projectID: string,
+  mergedIndex: number,
+  priority: number
+): Promise<void> {
+  const db = await openDB();
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  const store = tx.objectStore(STORE_NAME);
+  const indexObj = store.index(INDEX);
+  const request = indexObj.openCursor(IDBKeyRange.only(projectID));
+
+  let runningIndex = 0;
+
+  return new Promise((resolve, reject) => {
+    request.onerror = () => reject(request.error);
+
+    request.onsuccess = (event) => {
+      const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+
+      if (cursor) {
+        const file = cursor.value as FileItem;
+        const flashcards = file.flashcards || [];
+
+        if (runningIndex + flashcards.length > mergedIndex) {
+          const localIndex = mergedIndex - runningIndex;
+
+          if (!flashcards[localIndex]) {
+            reject(new Error("Flashcard index out of range"));
+            return;
+          }
+
+          flashcards[localIndex].priority = priority;
+          cursor.update(file);
+          resolve();
+        } else {
+          runningIndex += flashcards.length;
+          cursor.continue();
+        }
+      } else {
+        reject(new Error("Flashcard at merged index not found"));
+      }
+    };
+  });
+}
