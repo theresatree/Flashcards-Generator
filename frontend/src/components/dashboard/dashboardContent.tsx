@@ -10,7 +10,8 @@ export function DashboardContent() {
     const { selectedProjectID, selectedProjectDetails, selectedFileName } = useSidebarState();
     const [currentQuestionCounter, setCurrentQuestionCounter] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
-    const [endOfQuestion, setEndOfQuestion] = useState(false)
+    const [endOfQuestion, setEndOfQuestion] = useState(false);
+    const [priorityChosen,setPriorityChosen] = useState<number[][]>([]);
     const flashcards = selectedFileName ? selectedProjectDetails[selectedFileName] : selectedProjectDetails[selectedProjectID] || [];
     const answerRef = useRef<HTMLDivElement>(null);
     const [answerHeight, setAnswerHeight] = useState(0);
@@ -35,6 +36,7 @@ export function DashboardContent() {
         setCurrentQuestionCounter(0);
         setEndOfQuestion(false);
         setShowAnswer(false);
+        setPriorityChosen(flashcards.map(() => [] as number[]));
     }, [selectedProjectID, selectedFileName]);
 
     // Keyboard shortcuts
@@ -68,19 +70,39 @@ export function DashboardContent() {
                 }
                 setShowAnswer(false);
             } else if (e.code === "Digit1" || e.code === "Digit2" || e.code === "Digit3" || e.code === "Digit4" || e.code === "Digit5") {
-                const priority = parseInt(e.code.replace("Digit", ""), 10);
+                e.preventDefault();
 
-                // Test for if merged.
-                setCurrentQuestionCounter(priority - 1);
+                const priority = parseInt(e.code.replace("Digit", ""), 10);
+                if (endOfQuestion) {
+                    return
+                }
+    
+                setPriorityChosen(prev => {
+                    const next = prev.map(row => [...row]); // deep-copy rows
+                    next[currentQuestionCounter] = [ priority ];
+                     console.log("writing into row", currentQuestionCounter, "→", next);
+                    return next;
+                });
+                setCurrentQuestionCounter(prev => {
+                    if (prev < flashcards.length - 1) {
+                        return prev + 1;
+                    }
+                    setEndOfQuestion(true);
+                    return prev; // Stay at current position if at end
+                });
                 setShowAnswer(false);
-                setEndOfQuestion(false);
-}        }
+
+
+    
+                console.log(priorityChosen)
+                console.log(priority)
+            }        }
 
         document.addEventListener('keydown', handleGlobalKeyDown);
         return () => {
             document.removeEventListener('keydown', handleGlobalKeyDown);
         };
-    }, [flashcards.length, endOfQuestion]); // Need this because when we change project, this changes.
+    }, [flashcards.length, endOfQuestion, currentQuestionCounter]); // Need this because when we change project, this changes.
 
     if (!flashcards.length) {
         return (
@@ -100,10 +122,10 @@ export function DashboardContent() {
 
     return (
         <div className="flex flex-col text-[#FEEEEE] px-10 pb-10 size-full" tabIndex={0}>
-            <h3 className="right-1 text-xl font-semibold ml-auto">
+            <h3 className="right-1 text-lg font-semibold ml-auto">
                 {selectedFileName 
-              ? selectedFileName
-             : `${reverseProjectIDDate(selectedProjectID)} - ${reverseProjectIDTime(selectedProjectID)}`}
+                    ? selectedFileName
+                    : `${reverseProjectIDDate(selectedProjectID)} - ${reverseProjectIDTime(selectedProjectID)}`}
 
             </h3>
             {endOfQuestion ? 
@@ -153,7 +175,7 @@ export function DashboardContent() {
             </div>
 
             {/* Progress indicator */}
-            <div className="flex justify-between items-center text-sm text-gray-400 px-5 pt-5 pb-10">
+            <div className="flex justify-between items-center text-sm text-gray-400 px-5 pt-2 pb-5">
                 <span>
                     {currentQuestionCounter + 1} of {flashcards.length}
                 </span>
@@ -162,6 +184,51 @@ export function DashboardContent() {
                     <div>←/→ or H/L: Navigate</div>
                 </div>
             </div>
+
+
+            {/* Only show if not at the end of question.*/}
+            {!endOfQuestion && 
+            <div className="flex flex-col justify-center items-center w-full gap-2">
+                <span className="text-stone-400 font-semibold mb-1">Rate your proficiency</span>
+                <div className="flex flex-row gap-4">
+                    <div className= "px-3 py-1.5 bg-green-600 rounded-sm text-white">
+                        1 – Mastered
+                    </div>
+                    <div className="px-3 py-1.5 bg-lime-600 rounded-sm text-white">
+                        2 – Proficient
+                    </div>
+                    <div className="px-3 py-1.5 bg-yellow-600 rounded-sm text-white">
+                        3 – Good
+                    </div>
+                    <div className="px-3 py-1.5 bg-orange-600 rounded-sm text-white">
+                        4 – Fair
+                    </div>
+                    <div className="px-3 py-1.5 bg-red-600 rounded-sm text-white">
+                        5 – Bad
+                    </div>
+                </div>
+                <div className="gap-2 flex flex-row p-5 text-stone-400 font-semibold">
+                    Press
+                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
+                        1
+                    </kbd> 
+                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
+                        2
+                    </kbd> 
+                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
+                        3
+                    </kbd> 
+                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
+                        4
+                    </kbd> 
+                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
+                        5
+                    </kbd> 
+                    to rate
+                </div>
+
+
+            </div>}
         </div>
     );
 }
