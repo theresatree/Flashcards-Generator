@@ -5,6 +5,9 @@ import { DashboardFlashcard } from "./dashboardFlashcard";
 import { motion  } from "motion/react";  
 import { reverseProjectIDTime, reverseProjectIDDate } from "../../utils/reverseProjectID";
 import { updateFlashcardPriorityInAFile, updateFlashcardPriorityInAProject } from "../../db_utils/update_item";     
+import DashboardRating from "./dashboardRating";
+import DashboardProgressbar from "./dashboardProgressbar";
+import { Button } from "../ui/button";
 
 export function DashboardContent() {
     const { selectedProjectID, selectedProjectDetails, selectedFileName } = useSidebarState();
@@ -83,16 +86,6 @@ export function DashboardContent() {
                      console.log("writing into row", currentQuestionCounter, "→", next);
                     return next;
                 });
-                setCurrentQuestionCounter(prev => {
-                    if (prev < flashcards.length - 1) {
-                        return prev + 1;
-                    }
-                    setEndOfQuestion(true);
-                    return prev; // Stay at current position if at end
-                });
-                setShowAnswer(false);
-
-
     
                 console.log(priorityChosen)
                 console.log(priority)
@@ -117,7 +110,7 @@ export function DashboardContent() {
 
     const safeIdx = Math.max(0, Math.min(currentQuestionCounter, flashcards.length - 1));
     const currentFlashcard = flashcards[safeIdx];
-
+    const selectedPriority = priorityChosen[currentQuestionCounter]?.[0];
 
 
     return (
@@ -129,8 +122,10 @@ export function DashboardContent() {
 
             </h3>
             {endOfQuestion ? 
-                <div className="flex flex-col justify-center items-center max-w-[1000px] my-auto w-full mx-auto font-bold text-2xl">
-                    End of Flashcards
+                <div className="flex flex-col justify-center items-center max-w-[1000px] my-auto w-full mx-auto">
+                    <span className="text-2xl font-bold mb-10">End of Flashcards</span>
+                    <span className="text-stone-300 italic">Would you like to master this file?</span>
+                    <Button className="max-w-[200px] w-full mt-3 py-8 font-semibold text-xl">Yes</Button>
                 </div>
                 : 
                 <motion.div
@@ -164,71 +159,12 @@ export function DashboardContent() {
                     </motion.div>
                 </motion.div>
             }
-            {/* Progress bar */}
-            <div className="w-full bg-gray-700 rounded-full h-2">
-                <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ 
-                        width: `${((currentQuestionCounter + 1) / flashcards.length) * 100}%` 
-                    }}
-                ></div>
-            </div>
-
-            {/* Progress indicator */}
-            <div className="flex justify-between items-center text-sm text-gray-400 px-5 pt-2 pb-5">
-                <span>
-                    {currentQuestionCounter + 1} of {flashcards.length}
-                </span>
-                <div className="flex flex-row text-xs gap-5">
-                    <div>Space: {showAnswer ? 'Hide' : 'Show'} answer</div>
-                    <div>←/→ or H/L: Navigate</div>
-                </div>
-            </div>
+            {/* Progress bar and indications*/}
+            <DashboardProgressbar length={flashcards.length} currentQuestionCounter={currentQuestionCounter} showAnswer={showAnswer}/>   
 
 
-            {/* Only show if not at the end of question.*/}
-            {!endOfQuestion && 
-            <div className="flex flex-col justify-center items-center w-full gap-2">
-                <span className="text-stone-400 font-semibold mb-1">Rate your proficiency</span>
-                <div className="flex flex-row gap-4">
-                    <div className= "px-3 py-1.5 bg-green-600 rounded-sm text-white">
-                        1 – Mastered
-                    </div>
-                    <div className="px-3 py-1.5 bg-lime-600 rounded-sm text-white">
-                        2 – Proficient
-                    </div>
-                    <div className="px-3 py-1.5 bg-yellow-600 rounded-sm text-white">
-                        3 – Good
-                    </div>
-                    <div className="px-3 py-1.5 bg-orange-600 rounded-sm text-white">
-                        4 – Fair
-                    </div>
-                    <div className="px-3 py-1.5 bg-red-600 rounded-sm text-white">
-                        5 – Bad
-                    </div>
-                </div>
-                <div className="gap-2 flex flex-row p-5 text-stone-400 font-semibold">
-                    Press
-                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
-                        1
-                    </kbd> 
-                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
-                        2
-                    </kbd> 
-                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
-                        3
-                    </kbd> 
-                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
-                        4
-                    </kbd> 
-                    <kbd className="inline-block px-2 py-0.5 text-sm font-mono bg-gray-800 rounded shadow-inner">
-                        5
-                    </kbd> 
-                    to rate
-                </div>
-
-
-            </div>}
+            {/* Dashboard Rating: Only show if not at the end of question.*/}
+        {!endOfQuestion && <DashboardRating selectedPriority={selectedPriority}/>}
         </div>
     );
 }
