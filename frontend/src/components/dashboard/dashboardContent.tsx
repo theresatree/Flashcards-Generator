@@ -16,6 +16,7 @@ export function DashboardContent() {
     const [endOfQuestion, setEndOfQuestion] = useState(false);
     const [priorityChosen,setPriorityChosen] = useState<number[][]>([]);
     const flashcards = selectedFileName ? selectedProjectDetails[selectedFileName] : selectedProjectDetails[selectedProjectID] || [];
+    const [masteredCount, setMasteredCount] = useState(0)
     const answerRef = useRef<HTMLDivElement>(null);
     const [answerHeight, setAnswerHeight] = useState(0);
 
@@ -40,9 +41,10 @@ export function DashboardContent() {
         setEndOfQuestion(false);
         setShowAnswer(false);
         setPriorityChosen(flashcards.map(() => [] as number[]));
+        setMasteredCount(0)
     }, [selectedProjectID, selectedFileName]);
 
-    // Keyboard shortcuts
+    // Keyboard shortcut
     useEffect(() => {
         function handleGlobalKeyDown(e: KeyboardEvent) {
             // Only handle shortcuts if we have flashcards
@@ -79,6 +81,10 @@ export function DashboardContent() {
                 if (endOfQuestion) {
                     return
                 }
+
+                if (priority === 1){
+                    setMasteredCount(prev => prev + 1)
+                }
     
                 setPriorityChosen(prev => {
                     const next = prev.map(row => [...row]); // deep-copy rows
@@ -95,6 +101,7 @@ export function DashboardContent() {
         return () => {
             document.removeEventListener('keydown', handleGlobalKeyDown);
         };
+
     }, [flashcards.length, endOfQuestion, currentQuestionCounter]); // Need this because when we change project, this changes.
 
     if (!flashcards.length) {
@@ -121,11 +128,13 @@ export function DashboardContent() {
                     : `${reverseProjectIDDate(selectedProjectID)} - ${reverseProjectIDTime(selectedProjectID)}`}
 
             </h3>
+            <p className="right-1 text-sm italics text-stone-500 ml-auto">Mastered Flashcards: {masteredCount}</p>
             {endOfQuestion ? 
                 <div className="flex flex-col justify-center items-center max-w-[1000px] my-auto w-full mx-auto">
-                    <span className="text-2xl font-bold mb-10">End of Flashcards</span>
-                    <span className="text-stone-300 italic">Would you like to master this file?</span>
-                    <Button className="max-w-[200px] w-full mt-3 py-8 font-semibold text-xl">Yes</Button>
+                    <span className="text-2xl font-bold">End of Flashcards</span>
+                    <span className="text-stone-500 italics mb-15">{flashcards.length - masteredCount} more cards to mastery</span>
+                    <span className="text-stone-300 font-semibold">Would you like to continue?</span>
+                    <Button className="max-w-[200px] w-full mt-3 py-7 font-semibold text-xl hover:scale-110 transition ease-in-out active:scale-120">Yes</Button>
                 </div>
                 : 
                 <motion.div
