@@ -8,7 +8,7 @@ import { getFileType } from "./getFileType";
 import { toast } from "sonner";
 
 
-GlobalWorkerOptions.workerSrc = "/pdf.worker.js";
+GlobalWorkerOptions.workerSrc = "/Flashcards-Generator/pdf.worker.min.js";
 
 export async function getMostRecentProjectID(): Promise<string>{
     const projectIDs: string[] = await retrieveAllProjectIDs()

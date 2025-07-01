@@ -22,7 +22,7 @@ type Props={
     project_id: string
     files: Flashcard[];
 }
-const MAIN_URL = window.location.origin;
+const MAIN_URL = window.location.origin + "/Flashcards-Generator/";
 
 export default function QRDialog({open, onOpenChange, project_id, files}: Props){
     const readableFileName = `${reverseProjectIDDate(project_id)} - ${reverseProjectIDTime(project_id)}`;
@@ -38,11 +38,11 @@ export default function QRDialog({open, onOpenChange, project_id, files}: Props)
         const safeEncoded = encodeURIComponent(encodedData);
         if (encodedData.length <= 2500){
             toast.success("Link and QR successfully generated!")
-            setShowLink(`/shared?data=${safeEncoded}`)
+            setShowLink(`shared?data=${safeEncoded}`)
         } else if (encodedData.length > 2500 && encodedData.length <=7500 ){
             toast.warning("File too big for QR code. Generating Link")
             setShowQRCode(false)
-            setShowLink(`/shared?data=${safeEncoded}`)
+            setShowLink(`shared?data=${safeEncoded}`)
         } else {
             setShowQRCode(false)
             setShowLink("")
