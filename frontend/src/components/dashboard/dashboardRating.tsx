@@ -19,7 +19,7 @@ export default function DashboardRating({ selectedPriority, onRate }: Props) {
             <span className="text-stone-400 font-semibold mb-1">Rate your proficiency</span>
 
             {/* 🟩 Mobile View: Button-style */}
-            <div className="flex flex-row gap-4 justify-center md:hidden w-full mb-3">
+            <div className="flex flex-row gap-2 justify-center md:hidden w-full mb-5 max-w-[100%]">
                 {[1, 2, 3, 4, 5].map((level) => {
                     const { bg, border } = COLOR_CLASSES[level];
                     const label = ["Mastered", "Proficient", "Good", "Fair", "Bad"][level - 1];
@@ -42,7 +42,7 @@ export default function DashboardRating({ selectedPriority, onRate }: Props) {
             </div>
 
             {/* 🖥 Desktop View: Clickable rating boxes */}
-            <div className="hidden md:flex flex-row gap-4">
+            <div className="hidden md:flex flex-row gap-4 mb-5">
                 {[1, 2, 3, 4, 5].map((level) => {
                     const { bg, border } = COLOR_CLASSES[level];
                     const label = `${level} – ${["Mastered", "Proficient", "Good", "Fair", "Bad"][level - 1]}`;

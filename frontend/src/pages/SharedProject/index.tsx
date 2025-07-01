@@ -76,7 +76,7 @@ export default function SharedPage() {
                 opacity: 0,
                 transition: { opacity: { duration: 0.3, ease: "easeIn" } },
             }}
-            className="flex justify-center items-center w-full h-screen">
+            className="flex justify-center items-center w-full h-svh">
             <SharedPageContent selectedProjectDetails={flashcards}/>
         </motion.div>
     );

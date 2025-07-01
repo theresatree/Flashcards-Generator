@@ -176,7 +176,7 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
 
     return (
         <div 
-            className="flex flex-col text-[#FEEEEE] px-5 p-2 size-full" 
+            className="flex flex-col text-[#FEEEEE] px-5 p-2 w-full h-svh" 
             tabIndex={0} 
             onClick={() => {
                 // Only trigger on small screens
