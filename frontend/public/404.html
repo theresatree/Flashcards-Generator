@@ -4,9 +4,15 @@
     <meta charset="UTF-8" />
     <title>Redirecting...</title>
     <script>
-      // Preserve query string and hash (e.g. ?data=...)
-      const newUrl = '/Flashcards-Generator/shared' + location.search + location.hash;
-      window.location.replace(newUrl);
+      // Prevent infinite loop
+      const alreadyRedirected = sessionStorage.getItem('redirected');
+      if (!alreadyRedirected) {
+        sessionStorage.setItem('redirected', 'true');
+
+        // ✅ Redirect back to the *same* path but using the root path
+        const newUrl = '/Flashcards-Generator/' + location.pathname.replace('/Flashcards-Generator/', '') + location.search + location.hash;
+        window.location.replace(newUrl);
+      }
     </script>
   </head>
   <body>
