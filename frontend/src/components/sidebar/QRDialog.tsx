@@ -15,6 +15,7 @@ import { reverseProjectIDDate, reverseProjectIDTime } from "../../utils/reverseP
 import { encodeFlashcards } from "../../utils/QRCodeHelper";    
 import { useEffect, useState } from "react";
 import QRCodeGenerator from "../QRCodeImage";
+import { shortenUrl } from "./urlShortener";
 
 type Props={
     open: boolean
@@ -28,32 +29,56 @@ export default function QRDialog({open, onOpenChange, project_id, files}: Props)
     const readableFileName = `${reverseProjectIDDate(project_id)} - ${reverseProjectIDTime(project_id)}`;
     const [showQRCode, setShowQRCode] = useState(true)
     const [showLink, setShowLink] = useState("")
-    const [encodedSize, setEncodedSize] = useState(0)
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        if (!open) return;
-        const encodedData = encodeFlashcards(files)
-        setEncodedSize(encodedData.length)
-        const safeEncoded = encodeURIComponent(encodedData);
-        if (encodedData.length <= 2500){
-            toast.success("Link and QR successfully generated!")
-            setShowLink(`shared?data=${safeEncoded}`)
-        } else if (encodedData.length > 2500 && encodedData.length <=7500 ){
-            toast.warning("File too big for QR code. Generating Link")
-            setShowQRCode(false)
-            setShowLink(`shared?data=${safeEncoded}`)
-        } else {
-            setShowQRCode(false)
-            setShowLink("")
+      if (!open) return;
+      
+      const encodedData = encodeFlashcards(files);
+      const safeEncoded = encodeURIComponent(encodedData);
+      const fullUrl = MAIN_URL + "shared?data=" + safeEncoded;
+
+      async function generateLink() {
+        try {
+          let link = "";
+          if (encodedData.length <= 2500) {
+            toast.success("Link and QR successfully generated!");
+            setShowQRCode(true);
+            // Try to shorten, but use full URL as fallback
+            try {
+              link = await shortenUrl(fullUrl);
+            } catch (shortenError) {
+              console.warn("URL shortening failed, using full URL:", shortenError);
+              link = fullUrl;
+            }
+          } else if (encodedData.length <= 7500) {
+            toast.warning("File too big for QR code. Generating short link");
+            setShowQRCode(false);
+            try {
+              link = await shortenUrl(fullUrl);
+            } catch (shortenError) {
+              console.warn("URL shortening failed, using full URL:", shortenError);
+              link = fullUrl;
+            }
+          } else {
+            setShowQRCode(false);
+            toast.error("Too much data to share as a link");
+            link = fullUrl; // Still provide the full URL even if it's long
+          }
+          setShowLink(link);
+        } catch (err) {
+          console.error("Link generation failed:", err);
+          // Always provide at least the full URL
+          setShowLink(fullUrl);
         }
-        console.log(encodedSize)
-        console.log(encodedData)
-    },[files, open])
+      }
+      
+      generateLink();
+    }, [files, open]);
 
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(MAIN_URL+showLink);
+        navigator.clipboard.writeText(showLink);
         setCopied(true);
     };
 
@@ -74,12 +99,12 @@ export default function QRDialog({open, onOpenChange, project_id, files}: Props)
                     </AlertDialogTitle>
                     <AlertDialogDescription />
                 </AlertDialogHeader>
-                {showQRCode && <QRCodeGenerator value={MAIN_URL+showLink}/>}
+                {showQRCode && <QRCodeGenerator value={showLink}/>}
                 <div className="overflow-hidden px-3 pb-3">
                     <div className="flex flex-row gap-5 items-center">
                         <div className="flex-1 min-w-0 overflow-x-auto bg-zinc-800 text-gray-200 font-mono text-sm p-2 rounded">
                             <div className="truncate">
-                                {MAIN_URL+showLink}
+                                {showLink}
                             </div>
                         </div>
                         <Button 
