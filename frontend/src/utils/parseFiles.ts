@@ -1,5 +1,5 @@
 import * as mammoth from "mammoth";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
+import { getDocument } from "pdfjs-dist";
 import JSZip from "jszip";
 
 import type { FileItem, ProjectFilesDict } from "../models/models";
@@ -8,7 +8,6 @@ import { getFileType } from "./getFileType";
 import { toast } from "sonner";
 
 
-GlobalWorkerOptions.workerSrc = '/Flashcards-Generator/pdf.worker.js';
 
 export async function getMostRecentProjectID(): Promise<string>{
     const projectIDs: string[] = await retrieveAllProjectIDs()

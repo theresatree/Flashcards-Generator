@@ -1,3 +1,7 @@
+import { GlobalWorkerOptions } from 'pdfjs-dist/build/pdf';
+
+GlobalWorkerOptions.workerSrc = '/Flashcards-Generator/pdf.worker.js';
+
 
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "motion/react";
