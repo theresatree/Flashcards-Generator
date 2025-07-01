@@ -19,11 +19,12 @@ import { DropdownMenu,
 } from "../../components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { truncateFilename } from "../../utils/truncateString";
-import type { FileItem } from "../../models/models";
+import { Flashcard, type FileItem } from "../../models/models";
 import { useSidebarState } from "../../utils/SidebarContext";
 import { DeleteDialog } from "./confirmDeleteDialog";
 import { DeleteFileDialog } from "./deleteFileDialog";
 import { Link } from "react-router-dom";
+import QRDialog from "./QRDialog";
 
 type Props={
     projectIDs: string[],
@@ -35,6 +36,8 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
     const [reversedFilenames, setReversedFilenames] = useState<Record<string, string>>({});
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
     const [openDeleteFileDialog, setOpenDeleteFileDialog] = useState(false)
+    const [flashcardsForQR, setFlashcardsForQR] = useState<Flashcard[]>([])
+    const [openQRDialog, setOpenQRDialog] = useState(false)
     const MAX_FILE_LENGTH = 15;
 
     useEffect(() => {
@@ -70,6 +73,13 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                 [fileName]: flashcards,
             });
         }
+    }
+
+    function QRCodeHelper(project_id: string) {
+        // Get all flashcards for project ID `id`
+        const allFlashcards = projectFilesMap[project_id]?.flatMap(file => file.flashcards) || [];
+        setFlashcardsForQR(allFlashcards)
+        setOpenQRDialog(true)
     }
 
     return projectIDs.map((id) => (
@@ -134,6 +144,10 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
+                                onClick={()=>{QRCodeHelper(id)}}>
+                                    Share Project
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
                                     onClick={() => {setOpenDeleteDialog(true)}}>
                                     Delete Project 
                                 </DropdownMenuItem>
@@ -142,6 +156,9 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                     </DropdownMenu>
                 </SidebarMenuItem>
             </Collapsible>
+
+            {/*This is for the QR Dialog*/}
+            <QRDialog open={openQRDialog} onOpenChange={setOpenQRDialog} project_id={id} files={flashcardsForQR}/>
 
             {/*This is for the Dialog to delete.*/}
             <DeleteDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog} project_id={id}/>

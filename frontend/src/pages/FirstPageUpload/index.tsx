@@ -46,9 +46,10 @@ function FirstPageUpload() {
             </div>
             <div className="flex flex-col items-center justify-center text-sm mt-3 italic text-[#FEEEEE]">
                 <span>
-                    <button onClick={()=>setShowDrawer(true)} className="underline text-[#ADD8E6] cursor-pointer">Click here</button> {" "}
+                    <button disabled onClick={()=>setShowDrawer(true)} className="underline text-stone-500 cursor-pointer">Click here</button> {" "}
                     to manually create flashcards from your own LLM 
                 </span>
+                <span className="text-stone-500">Might implement in future</span>
                 <span className="mt-5">
                     This flashcard generator will <span className="underline decoration-red-500">only be able to parse text</span> from documents
                 </span>

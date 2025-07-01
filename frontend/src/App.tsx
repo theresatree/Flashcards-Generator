@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import EditFlashCardsInProjects from "./components/sidebar/editFlashCardInProjects.tsx";
 import { Toaster } from "./components/ui/sonner";
 import { SidebarLayout } from "./utils/SidebarLayout";
+import SharedPage from "./pages/SharedProject/index.tsx";
 
 //Routes + AnimatePresence
 function AppRoutes() {
@@ -22,6 +23,7 @@ function AppRoutes() {
                     <Route path="/upload/:projectID?" element={<FirstPageUpload />} />
                     <Route path="/confirmation" element={<ConfirmFlashCards />} />
                     <Route path="/edit" element={<EditFlashCardsInProjects />} />
+                    <Route path="/shared" element={<SharedPage />} />
                 </Routes>
             </div>
         </AnimatePresence>

@@ -1,28 +1,32 @@
 import { useEffect, useState, useRef } from "react";
-import { useSidebarState } from "../../utils/SidebarContext";
-import { MarkdownRenderer } from "../markdownComponents";
-import { DashboardFlashcard } from "./dashboardFlashcard";
+import { MarkdownRenderer } from "./markdownComponents";
+import { DashboardFlashcard } from "./dashboard/dashboardFlashcard";
 import { motion  } from "motion/react";  
-import { reverseProjectIDTime, reverseProjectIDDate } from "../../utils/reverseProjectID";
-import DashboardRating from "./dashboardRating";
-import DashboardProgressbar from "./dashboardProgressbar";
-import { Button } from "../ui/button";
+import DashboardRating from "./dashboard/dashboardRating";
+import DashboardProgressbar from "./dashboard/dashboardProgressbar";
+import { Button } from "./ui/button";
+import type { Flashcard } from "../models/models";
 import { toast } from "sonner";
 
-export function DashboardContent() {
-    const { selectedProjectID, selectedProjectDetails, selectedFileName } = useSidebarState();
+
+type Props= {
+    selectedProjectDetails: Flashcard[]
+}
+
+export default function SharedPageContent({selectedProjectDetails}: Props) {
     const [currentQuestionCounter, setCurrentQuestionCounter] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
     const [endOfQuestion, setEndOfQuestion] = useState(false);
     const [priorityChosen,setPriorityChosen] = useState<number[][]>([]);
-    const flashcards = selectedFileName ? selectedProjectDetails[selectedFileName] : selectedProjectDetails[selectedProjectID] || [];
     const [masteredCount, setMasteredCount] = useState(0);
     const [reviewMode, setReviewMode] = useState(false);
-    const [filteredFlashcards, setFilteredFlashcards] = useState<typeof flashcards>([]);
+    const [filteredFlashcards, setFilteredFlashcards] = useState<Flashcard[]>([]);
     const answerRef = useRef<HTMLDivElement>(null);
     const [answerHeight, setAnswerHeight] = useState(0);
     const [clickDisabled, setClickDisabled] = useState(false);
 
+
+    const flashcards = selectedProjectDetails;
     const activeFlashcards = reviewMode ? filteredFlashcards : flashcards;
 
     useEffect(() => {
@@ -47,7 +51,7 @@ export function DashboardContent() {
         setMasteredCount(0);
         setReviewMode(false);
         setFilteredFlashcards([]);
-    }, [selectedProjectID, selectedFileName]);
+    }, [flashcards]);
 
     function applyRating(priority: number, advanceAfter: boolean = false) {
         const actualIndex = reviewMode
@@ -67,6 +71,7 @@ export function DashboardContent() {
 
         if (advanceAfter) {
             toast.success("Successfully set proficiency")
+                setShowAnswer(false);
             setTimeout(()=>{
                 const limit = activeFlashcards.length;
                 setCurrentQuestionCounter(prev => {
@@ -74,12 +79,10 @@ export function DashboardContent() {
                     setEndOfQuestion(true);
                     return prev;
                 });
-                setShowAnswer(false);
 
-            },200)
+            },500)
         }
     }
-
 
     useEffect(() => {
         function handleGlobalKeyDown(e: KeyboardEvent) {
@@ -99,12 +102,13 @@ export function DashboardContent() {
                 setShowAnswer(false);
             } else if (e.code === "ArrowLeft" || e.code === "KeyH") {
                 e.preventDefault();
-                if ((flashcards.length - masteredCount) === 0) return;
-                if (endOfQuestion) {
-                    setEndOfQuestion(false);
-                } else {
-                    setCurrentQuestionCounter(prev => (prev > 0 ? prev - 1 : prev));
+                if ((flashcards.length-masteredCount) === 0){
+                    return;
                 }
+                if (endOfQuestion) setEndOfQuestion(false);
+                    else {
+                        setCurrentQuestionCounter(prev => (prev > 0 ? prev - 1 : prev));
+                    }
                 setShowAnswer(false);
             } else if (e.code.startsWith("Digit")) {
                 const priority = parseInt(e.code.replace("Digit", ""), 10);
@@ -113,10 +117,10 @@ export function DashboardContent() {
                 }
             }
         }
-
         document.addEventListener('keydown', handleGlobalKeyDown);
         return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-    }, [flashcards, activeFlashcards, currentQuestionCounter, endOfQuestion, reviewMode, priorityChosen, masteredCount]);
+    }, [flashcards.length, activeFlashcards, currentQuestionCounter, endOfQuestion, reviewMode]);
+
 
 
     function handleContinueMastery() {
@@ -150,6 +154,7 @@ export function DashboardContent() {
 
 
 
+
     const safeIdx = Math.max(0, Math.min(currentQuestionCounter, activeFlashcards.length - 1));
     const currentFlashcard = activeFlashcards[safeIdx];
 
@@ -171,7 +176,7 @@ export function DashboardContent() {
 
     return (
         <div 
-            className="flex flex-col text-[#FEEEEE] px-10 pb-10 size-full" 
+            className="flex flex-col text-[#FEEEEE] px-5 p-2 size-full" 
             tabIndex={0} 
             onClick={() => {
                 // Only trigger on small screens
@@ -180,12 +185,7 @@ export function DashboardContent() {
                     setShowAnswer(prev => !prev);
                 }
             }}>
-            <h3 className="right-1 text-lg font-semibold ml-auto">
-                {selectedFileName 
-                    ? selectedFileName
-                    : `${reverseProjectIDDate(selectedProjectID)} - ${reverseProjectIDTime(selectedProjectID)}`}
-            </h3>
-            <p className="right-1 text-sm italics text-stone-500 ml-auto">Mastered Flashcards: {masteredCount}</p>
+            <p className="right-1 text-sm italics text-stone-500 ml-auto mr-2 mt-2">Mastered Flashcards: {masteredCount}</p>
             {endOfQuestion ? (
                 <div className="flex flex-col justify-center items-center max-w-[1000px] my-auto w-full mx-auto">
                     <span className="text-2xl font-bold">End of Flashcards</span>
@@ -207,9 +207,9 @@ export function DashboardContent() {
             ) : (
                     <motion.div className="flex flex-col justify-center items-center max-w-[1000px] my-auto w-full mx-auto">
                         <motion.div
-                            className="absolute text-2xl font-semibold text-center max-w-[70%] break-words w-full"
+                            className="absolute md:text-2xl text-md font-semibold text-center max-w-[90%] break-words w-full"
                             initial={false}
-                            animate={{ y: showAnswer ? -answerHeight/1.5 : 0 }}
+                            animate={{ y: showAnswer ? -answerHeight/2 : 0 }}
                             transition={{ duration: 0.3, ease: "easeOut" }}
                         >
                             <MarkdownRenderer content={currentFlashcard.question} />
@@ -237,14 +237,10 @@ export function DashboardContent() {
                         currentQuestionCounter={currentQuestionCounter} 
                         showAnswer={showAnswer} 
                     />
-
-
                     <DashboardRating
                         selectedPriority={selectedPriority}
                         onRate={(level) => applyRating(level, true)}
                     />
-
-
                 </>
             ) 
             }

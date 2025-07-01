@@ -1,12 +1,11 @@
 
-
-type Props={
+type Props = {
     length: number;
     currentQuestionCounter: number;
     showAnswer: boolean;
-}
+};
 
-export default function DashboardProgressbar({length, currentQuestionCounter, showAnswer}: Props){
+export default function DashboardProgressbar({ length, currentQuestionCounter, showAnswer }: Props) {
     return (
         <div>
             <div className="w-full bg-gray-700 rounded-full h-2">
@@ -22,13 +21,19 @@ export default function DashboardProgressbar({length, currentQuestionCounter, sh
                 <span>
                     {currentQuestionCounter + 1} of {length}
                 </span>
-                <div className="flex flex-row text-xs gap-5">
+
+                {/* 👇 Mobile View: Show tap hint */}
+                <div className="block md:hidden text-xs text-right">
+                    Tap to {showAnswer ? "hide" : "show"} answer
+                </div>
+
+                {/* 👇 Desktop View: Show keyboard shortcuts */}
+                <div className="hidden md:flex flex-row text-xs gap-5">
                     <div>Space: {showAnswer ? 'Hide' : 'Show'} answer</div>
                     <div>←/→ or H/L: Navigate</div>
                 </div>
             </div>
         </div>
-
-
     );
 }
+

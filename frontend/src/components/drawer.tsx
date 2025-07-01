@@ -15,7 +15,7 @@ import { toast } from "sonner";
 const instructionMarkdown = 
 `You are a helpful assistant.
 
-Your task is to generate exactly [flashcardLimit] high-quality question-and-answer pairs based on the provided text.
+Your task is to generate exactly 10 high-quality question-and-answer pairs based on the provided text.
 
 **Formatting Rules:**
 - Each question should be clearly labeled: **Q1**, **Q2**, etc.
@@ -69,7 +69,7 @@ export default function DrawerShow({ open, onOpenChange }: DrawerShowProps) {
                         Default: 10 flashcards
                     </span>
                     <DrawerDescription>
-                        <pre className="relative mx-auto whitespace-pre-wrap text-left w-full p-2 rounded bg-zinc-800 text-gray-200 font-mono text-sm max-w-[800px]">
+<pre className="relative mx-auto whitespace-pre-wrap text-left w-full p-2 rounded bg-zinc-800 text-gray-200 font-mono text-sm max-w-[800px] max-h-[300px] overflow-y-auto">
                             {instructionMarkdown}
                             <Button 
                                 size="icon"
