@@ -23,7 +23,6 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
     const [filteredFlashcards, setFilteredFlashcards] = useState<Flashcard[]>([]);
     const answerRef = useRef<HTMLDivElement>(null);
     const [answerHeight, setAnswerHeight] = useState(0);
-    const [clickDisabled, setClickDisabled] = useState(false);
 
 
     const flashcards = selectedProjectDetails;
@@ -124,7 +123,6 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
 
 
     function handleContinueMastery() {
-        setClickDisabled(true);
         // Step 1: Build a list of unmastered flashcards with index + priority
         const unmastered: { idx: number; priority: number }[] = [];
 
@@ -145,11 +143,11 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
         // Step 3: Build new flashcard set
         const newFlashcards = sorted.map(item => flashcards[item.idx]);
 
+        setShowAnswer(false);
         setFilteredFlashcards(newFlashcards);
         setReviewMode(true);
         setCurrentQuestionCounter(0);
         setEndOfQuestion(false);
-        setShowAnswer(false);
     }
 
 
@@ -178,12 +176,10 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
         <div 
             className="flex flex-col text-[#FEEEEE] px-5 p-2 w-full h-svh" 
             tabIndex={0} 
-            onClick={() => {
+            onClick={(e) => {
+                e.stopPropagation(); 
                 // Only trigger on small screens
-                if (clickDisabled) return;
-                if (window.innerWidth < 1500) {
-                    setShowAnswer(prev => !prev);
-                }
+                setShowAnswer(prev => !prev);
             }}>
             <p className="right-1 text-sm italics text-stone-500 ml-auto mr-2 mt-2">Mastered Flashcards: {masteredCount}</p>
             {endOfQuestion ? (
@@ -195,7 +191,10 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
                             <span className="text-stone-300 font-semibold">Would you like to continue?</span>
                             <Button 
                                 className="max-w-[200px] w-full mt-3 py-7 font-semibold text-xl hover:scale-110 transition ease-in-out active:scale-120"
-                                onClick={handleContinueMastery}
+                                onClick={(e) => {
+                                e.stopPropagation();
+                                handleContinueMastery()
+                                }}
                             >Yes</Button>
 
                         </>

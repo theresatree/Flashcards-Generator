@@ -21,7 +21,6 @@ export function DashboardContent() {
     const [filteredFlashcards, setFilteredFlashcards] = useState<typeof flashcards>([]);
     const answerRef = useRef<HTMLDivElement>(null);
     const [answerHeight, setAnswerHeight] = useState(0);
-    const [clickDisabled, setClickDisabled] = useState(false);
 
     const activeFlashcards = reviewMode ? filteredFlashcards : flashcards;
 
@@ -120,7 +119,6 @@ export function DashboardContent() {
 
 
     function handleContinueMastery() {
-        setClickDisabled(true);
         // Step 1: Build a list of unmastered flashcards with index + priority
         const unmastered: { idx: number; priority: number }[] = [];
 
@@ -173,12 +171,10 @@ export function DashboardContent() {
         <div 
             className="flex flex-col text-[#FEEEEE] px-10 pb-10 size-full" 
             tabIndex={0} 
-            onClick={() => {
+            onClick={(e) => {
+                e.stopPropagation(); 
                 // Only trigger on small screens
-                if (clickDisabled) return;
-                if (window.innerWidth < 1500) {
-                    setShowAnswer(prev => !prev);
-                }
+                setShowAnswer(prev => !prev);
             }}>
             <h3 className="right-1 text-lg font-semibold ml-auto">
                 {selectedFileName 
@@ -195,7 +191,10 @@ export function DashboardContent() {
                             <span className="text-stone-300 font-semibold">Would you like to continue?</span>
                             <Button 
                                 className="max-w-[200px] w-full mt-3 py-7 font-semibold text-xl hover:scale-110 transition ease-in-out active:scale-120"
-                                onClick={handleContinueMastery}
+                                onClick={(e) => {
+                                e.stopPropagation();
+                                handleContinueMastery()
+                                }}
                             >Yes</Button>
 
                         </>
