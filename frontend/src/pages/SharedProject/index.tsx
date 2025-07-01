@@ -14,18 +14,24 @@ export default function SharedPage() {
     const [error, setError] = useState<string|null>(null);
 
 
-    useEffect(()=>{
-        const encodedData = searchParams.get("data") 
-        if (!encodedData){
+    useEffect(() => {
+        const encodedData = searchParams.get("data");
+        console.log("🔍 raw data param:", encodedData);
+
+        if (!encodedData) {
             setError("No flashcards found");
             return;
         }
+
         try {
-            const decoded = decodeFlashcards(encodedData);
+            const safeDecoded = decodeURIComponent(encodedData);
+            console.log("🔓 Decoded string:", safeDecoded);
+            const decoded = decodeFlashcards(safeDecoded); // <- important
+            console.log("✅ Decoded flashcards:", decoded);
             setFlashcards(decoded);
-            setIsLoading(false)
+            setIsLoading(false);
         } catch (err) {
-            console.error("❌ Failed to decode flashcards:", err);
+            console.error("❌ Flashcard decode failed:", err);
             setError("Invalid or corrupted flashcard data.");
         }
     }, [searchParams]);
