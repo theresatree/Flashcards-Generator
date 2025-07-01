@@ -22,7 +22,7 @@ type Props={
     project_id: string
     files: Flashcard[];
 }
-const MAIN_URL = window.location.origin + "/Flashcards-Generator/";
+const MAIN_URL = `${window.location.origin}/Flashcards-Generator/#/`;
 
 export default function QRDialog({open, onOpenChange, project_id, files}: Props){
     const readableFileName = `${reverseProjectIDDate(project_id)} - ${reverseProjectIDTime(project_id)}`;

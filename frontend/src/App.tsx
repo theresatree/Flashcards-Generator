@@ -3,7 +3,7 @@ import { GlobalWorkerOptions } from 'pdfjs-dist/build/pdf';
 GlobalWorkerOptions.workerSrc = '/Flashcards-Generator/pdf.worker.js';
 
 
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "motion/react";
 import FirstPageUpload from "./pages/FirstPageUpload";
 import ConfirmFlashCards from "./pages/ConfirmFlashCards";
@@ -37,7 +37,7 @@ function AppRoutes() {
 //Top-level App with Router & Toaster
 function App() {
     return (
-        <Router basename="/Flashcards-Generator">
+        <Router >
             <Toaster richColors position="top-center" />
             <AppRoutes />
         </Router>
