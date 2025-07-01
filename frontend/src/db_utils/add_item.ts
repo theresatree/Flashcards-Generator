@@ -6,7 +6,6 @@ import {STORE_NAME} from "./definitions";
 
 async function getLowestAvailableKey(store: IDBObjectStore): Promise<number> {
     return new Promise((resolve, reject) => {
-        const keys: number[] = [];
         const request = store.getAllKeys();
 
         request.onsuccess = () => {

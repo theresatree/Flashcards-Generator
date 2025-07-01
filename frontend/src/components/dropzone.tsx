@@ -51,7 +51,7 @@ function Dropzone({projectID}: Props) {
     }, []);
 
 
-        const processFiles = async (): Promise<{ pid: string, uploadedFiles: string[] } | null> => {
+        const processFiles = async (): Promise<{ pid: string, uploadedFiles: string[] }| null> => {
         const pid = projectID ?? generateProjectId();
         const existingItems = await retrieveAllFilesByProjectID(pid);
         const existingFilenames = new Set(existingItems.map(file => file.filename));
@@ -97,10 +97,12 @@ function Dropzone({projectID}: Props) {
                 return { pid, uploadedFiles };
             } else {
                 toast.error("Some files failed to upload");
+                return null;
             }
         } catch (error) {
             toast.error("An error occurred during file upload");
             console.error(error);
+            return null;
         }
     };
 

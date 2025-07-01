@@ -19,7 +19,7 @@ import { DropdownMenu,
 } from "../../components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { truncateFilename } from "../../utils/truncateString";
-import { Flashcard, type FileItem } from "../../models/models";
+import type { Flashcard, FileItem } from "../../models/models";
 import { useSidebarState } from "../../utils/SidebarContext";
 import { DeleteDialog } from "./confirmDeleteDialog";
 import { DeleteFileDialog } from "./deleteFileDialog";

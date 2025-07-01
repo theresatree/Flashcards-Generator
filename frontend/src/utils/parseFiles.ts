@@ -2,7 +2,6 @@ import * as mammoth from "mammoth";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import JSZip from "jszip";
 
-import { truncateFilename } from "./truncateString";
 import type { FileItem, ProjectFilesDict } from "../models/models";
 import { retrieveAllFilesByProjectID, retrieveAllProjectIDs } from "../db_utils/retrieve_item";
 import { getFileType } from "./getFileType";
