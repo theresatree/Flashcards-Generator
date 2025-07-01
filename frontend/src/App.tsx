@@ -33,7 +33,7 @@ function AppRoutes() {
 //Top-level App with Router & Toaster
 function App() {
     return (
-        <Router>
+        <Router basename="/Flashcards-Generator">
             <Toaster richColors position="top-center" />
             <AppRoutes />
         </Router>
