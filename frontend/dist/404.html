@@ -1,21 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <title>Redirecting...</title>
-    <script>
-      // Prevent infinite loop
-      const alreadyRedirected = sessionStorage.getItem('redirected');
-      if (!alreadyRedirected) {
-        sessionStorage.setItem('redirected', 'true');
-
-        // ✅ Redirect back to the *same* path but using the root path
-        const newUrl = '/Flashcards-Generator/' + location.pathname.replace('/Flashcards-Generator/', '') + location.search + location.hash;
-        window.location.replace(newUrl);
+    <meta charset="utf-8">
+    <title>Flashcards Generator - Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #303030;
+        color: #FEEEEE;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
       }
+      .loading {
+        font-size: 18px;
+      }
+      .spinner {
+        border: 3px solid #444;
+        border-top: 3px solid #FEEEEE;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // MIT License
+      // https://github.com/rafgraph/spa-github-pages
+      
+      // For GitHub Pages project sites (not custom domains), set pathSegmentsToKeep to 1
+      // This preserves the repository name in the URL path
+      var pathSegmentsToKeep = 1;
+
+      var l = window.location;
+      
+      // Convert the current URL path to a query parameter format
+      // Example: /Flashcards-Generator/shared?data=abc becomes /Flashcards-Generator/?/shared&data=abc
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
     </script>
   </head>
   <body>
-    <p>Redirecting to app...</p>
+    <div>
+      <div class="spinner"></div>
+      <div class="loading">Redirecting to Flashcards Generator...</div>
+      <p style="font-size: 14px; color: #ccc; margin-top: 20px;">
+        If you are not redirected automatically, please check your URL and try again.
+      </p>
+    </div>
   </body>
 </html>
