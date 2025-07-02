@@ -64,6 +64,11 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
 
 
     function applyRating(priority: number, advanceAfter: boolean = false) {
+           if (!showAnswer){ 
+            toast.error("Show answer to continue")
+            return;
+        }
+
         const actualIndex = reviewMode
             ? flashcards.indexOf(activeFlashcards[currentQuestionCounter])
             : currentQuestionCounter;
@@ -211,7 +216,7 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
                         <motion.div
                             className="absolute md:text-2xl text-md font-semibold text-center max-w-[90%] break-words w-full"
                             initial={false}
-                            animate={{ y: showAnswer ? -answerHeight/2 : 0 }}
+                            animate={{ y: showAnswer ? -answerHeight/1.5 : 0 }}
                             transition={{ duration: 0.3, ease: "easeOut" }}
                         >
                             <MarkdownRenderer content={currentFlashcard.question} />
