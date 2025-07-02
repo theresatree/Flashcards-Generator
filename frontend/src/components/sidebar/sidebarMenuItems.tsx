@@ -25,6 +25,7 @@ import { DeleteDialog } from "./confirmDeleteDialog";
 import { DeleteFileDialog } from "./deleteFileDialog";
 import { Link } from "react-router-dom";
 import QRDialog from "./QRDialog";
+import RAGDialog from "./RAGDialog";
 
 type Props={
     projectIDs: string[],
@@ -38,7 +39,11 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
     const [openDeleteFileDialog, setOpenDeleteFileDialog] = useState(false)
     const [flashcardsForQR, setFlashcardsForQR] = useState<Flashcard[]>([])
     const [openQRDialog, setOpenQRDialog] = useState(false)
+    const [openRAGDialog, setOpenRAGDialog] = useState(false)
     const MAX_FILE_LENGTH = 15;
+
+    const [currentProjectId, setCurrentProjectId] = useState<string>("")
+    const [currentProjectFiles, setCurrentProjectFiles] = useState<FileItem[]>([])
 
     useEffect(() => {
         const newReversedFilenames: Record<string, string> = {};
@@ -76,10 +81,28 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
     }
 
     function QRCodeHelper(project_id: string) {
-        // Get all flashcards for project ID `id`
         const allFlashcards = projectFilesMap[project_id]?.flatMap(file => file.flashcards) || [];
         setFlashcardsForQR(allFlashcards)
+        setCurrentProjectId(project_id)
         setOpenQRDialog(true)
+    }
+
+
+    const handleRAGDialog = (project_id: string) => {
+        setCurrentProjectId(project_id)
+        setCurrentProjectFiles(projectFilesMap[project_id] || [])
+        setOpenRAGDialog(true)
+    }
+
+    const handleDeleteDialog = (project_id: string) => {
+        setCurrentProjectId(project_id)
+        setOpenDeleteDialog(true)
+    }
+
+    const handleDeleteFileDialog = (project_id: string) => {
+        setCurrentProjectId(project_id)
+        setCurrentProjectFiles(projectFilesMap[project_id] || [])
+        setOpenDeleteFileDialog(true)
     }
 
     return projectIDs.map((id) => (
@@ -120,6 +143,15 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                                 >
                                     Test all from this project
                                 </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    className="mb-1"                                 
+                                    onClick={() => {
+                                        handleRAGDialog(id)
+                                    }}
+                                >
+                                    Prompt a question 
+                                </DropdownMenuItem>
+
                                 <DropdownMenuSeparator className=""/>
                                 <DropdownMenuItem 
                                     className="mb-1">
@@ -138,17 +170,17 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                                         to={`/upload/${id}`}>Add file</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
-                                    onClick={()=>setOpenDeleteFileDialog(true)}
+                                    onClick={()=>handleDeleteFileDialog(id)}
                                     className="mb-1">
                                     Delete File
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
-                                onClick={()=>{QRCodeHelper(id)}}>
+                                    onClick={()=>{QRCodeHelper(id)}}>
                                     Share Project
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => {setOpenDeleteDialog(true)}}>
+                                    onClick={() => handleDeleteDialog(id)}>
                                     Delete Project 
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
@@ -157,16 +189,37 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                 </SidebarMenuItem>
             </Collapsible>
 
-            {/*This is for the QR Dialog*/}
-            <QRDialog open={openQRDialog} onOpenChange={setOpenQRDialog} project_id={id} files={flashcardsForQR}/>
+            {currentProjectId && (
+                <>
+                    <QRDialog 
+                        open={openQRDialog} 
+                        onOpenChange={setOpenQRDialog} 
+                        project_id={currentProjectId} 
+                        files={flashcardsForQR}
+                    />
 
-            {/*This is for the Dialog to delete.*/}
-            <DeleteDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog} project_id={id}/>
-            <DeleteFileDialog 
-                open={openDeleteFileDialog}
-                onOpenChange={setOpenDeleteFileDialog}
-                project_id={id}
-                files={projectFilesMap[id] || []}/>
+                    <RAGDialog 
+                        open={openRAGDialog}
+                        onOpenChange={setOpenRAGDialog}
+                        project_id={currentProjectId}
+                        files={currentProjectFiles}
+                    />
+
+                    <DeleteDialog 
+                        open={openDeleteDialog} 
+                        onOpenChange={setOpenDeleteDialog} 
+                        project_id={currentProjectId}
+                    />
+
+                    <DeleteFileDialog 
+                        open={openDeleteFileDialog}
+                        onOpenChange={setOpenDeleteFileDialog}
+                        project_id={currentProjectId}
+                        files={currentProjectFiles}
+                    />
+                </>
+            )}
+
         </SidebarMenu>
     ));
 }

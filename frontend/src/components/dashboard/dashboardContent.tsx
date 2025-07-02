@@ -21,6 +21,7 @@ export function DashboardContent() {
     const [filteredFlashcards, setFilteredFlashcards] = useState<typeof flashcards>([]);
     const answerRef = useRef<HTMLDivElement>(null);
     const [answerHeight, setAnswerHeight] = useState(0);
+    const [disableClick, setDisableClick]= useState(false);
 
     const activeFlashcards = reviewMode ? filteredFlashcards : flashcards;
 
@@ -48,7 +49,19 @@ export function DashboardContent() {
         setFilteredFlashcards([]);
     }, [selectedProjectID, selectedFileName]);
 
+    useEffect(()=>{
+        if (endOfQuestion){
+            setDisableClick(true)
+        } else {
+            setDisableClick(false)
+        }
+    },[endOfQuestion])
+
     function applyRating(priority: number, advanceAfter: boolean = false) {
+        if (!showAnswer){ 
+            toast.error("Show answer to continue")
+            return;
+        }
         const actualIndex = reviewMode
             ? flashcards.indexOf(activeFlashcards[currentQuestionCounter])
             : currentQuestionCounter;
@@ -87,15 +100,6 @@ export function DashboardContent() {
             if (e.code === "Space" || e.key === " ") {
                 e.preventDefault();
                 setShowAnswer(prev => !prev);
-            } else if (e.code === "ArrowRight" || e.code === "KeyL") {
-                e.preventDefault();
-                const limit = activeFlashcards.length;
-                setCurrentQuestionCounter(prev => {
-                    if (prev < limit - 1) return prev + 1;
-                    setEndOfQuestion(true);
-                    return prev;
-                });
-                setShowAnswer(false);
             } else if (e.code === "ArrowLeft" || e.code === "KeyH") {
                 e.preventDefault();
                 if ((flashcards.length - masteredCount) === 0) return;
@@ -108,14 +112,14 @@ export function DashboardContent() {
             } else if (e.code.startsWith("Digit")) {
                 const priority = parseInt(e.code.replace("Digit", ""), 10);
                 if (!isNaN(priority) && !endOfQuestion) {
-                    applyRating(priority, false); // Keyboard: do not advance
+                    applyRating(priority, true); // Keyboard: do not advance
                 }
             }
         }
 
         document.addEventListener('keydown', handleGlobalKeyDown);
         return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-    }, [flashcards, activeFlashcards, currentQuestionCounter, endOfQuestion, reviewMode, priorityChosen, masteredCount]);
+    }, [flashcards, activeFlashcards, currentQuestionCounter, endOfQuestion, reviewMode, priorityChosen, masteredCount, showAnswer]);
 
 
     function handleContinueMastery() {
@@ -173,6 +177,7 @@ export function DashboardContent() {
             tabIndex={0} 
             onClick={(e) => {
                 e.stopPropagation(); 
+                if (disableClick) return;
                 // Only trigger on small screens
                 setShowAnswer(prev => !prev);
             }}>

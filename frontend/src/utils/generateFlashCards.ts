@@ -6,6 +6,30 @@ import { getGeminiApiKey } from "./LocalStorageCRUD";
 
 
 export async function generateFlashcards(projectID: string) {
+
+    async function callGemini(model: string, content: string): Promise<string> {
+        const maxRetries = model === "gemini-2.0-flash" ? 2 : 1;
+        for (let i = 0; i <= maxRetries; i++) {
+            try {
+                const resp = await ai.models.generateContent({
+                    model,
+                    contents: [content],
+                });
+                if (resp.text) return resp.text.trim();
+                throw new Error("Empty response");
+            } catch (err: any) {
+                const is503 = err?.code === 503 || err?.message?.includes("UNAVAILABLE");
+                if (is503 && i < maxRetries) {
+                    await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+                    continue;
+                }
+                throw err;
+            }
+        }
+        throw new Error("Out of retries");
+    }
+
+
     const geminiKey = getGeminiApiKey();
     const ai = new GoogleGenAI({ apiKey: `${geminiKey}`});
 
@@ -52,19 +76,14 @@ A2: …
 ${combinedText}
 `.trim();
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: [prompt], 
-        });
-        console.log(response.text);
-
-
-        if (!response || !response.text) {
-            toast.error("Failed to call LLM")
-            throw new Error("LLM call failed");
+        let content: string;
+        try {
+            content = await callGemini("gemini-2.0-flash", prompt);
+        } catch (err: any) {
+            console.error(`LLM error for ${file.filename}:`, err);
+            toast.error(`Failed to generate flashcards for ${file.filename}`);
+            continue;  // skip this file and move on
         }
-
-        const content = response.text;
 
         const regex = /Q\d+:\s*(.*?)\n+A\d+:\s*(.*?)(?=\n+Q\d+:|\n*$)/gs;
 

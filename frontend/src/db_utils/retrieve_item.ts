@@ -1,5 +1,5 @@
 import { openDB } from "./db_setup";
-import type { FileItem, Flashcard } from "@/models/models";
+import type { FileItem, Flashcard, FileChunksAndEmbeddingsUpdate } from "../models/models";
 import { INDEX, STORE_NAME } from "./definitions";
 
 export async function retrieveAllFiles(): Promise<FileItem[]> {
@@ -87,3 +87,20 @@ export async function retrieveFlashcardByIndex(projectID: string,filename: strin
 
   return flashcards[index];
 }
+
+export async function retrieveEmbeddedChunks( projectID: string, filename: string): Promise<{ chunks: string[]; embeddings: number[][]; }> {
+  const file = await retrieveFileByFileNameWithProjectID(projectID, filename);
+
+  const data = (file as unknown) as FileChunksAndEmbeddingsUpdate[string];
+  if (!data?.chunks?.length || !data?.embeddings?.length) {
+    throw new Error(
+      `No embedded chunks found for project ${projectID}, file ${filename}`
+    );
+  }
+
+  return {
+    chunks:     data.chunks,
+    embeddings: data.embeddings,
+  };
+}
+

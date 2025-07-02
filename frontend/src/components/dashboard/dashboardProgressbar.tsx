@@ -30,7 +30,7 @@ export default function DashboardProgressbar({ length, currentQuestionCounter, s
                 {/* 👇 Desktop View: Show keyboard shortcuts */}
                 <div className="hidden md:flex flex-row text-xs gap-5">
                     <div>Space: {showAnswer ? 'Hide' : 'Show'} answer</div>
-                    <div>←/→ or H/L: Navigate</div>
+                    <div>← or H: Navigate back</div>
                 </div>
             </div>
         </div>
