@@ -9,6 +9,7 @@ import FirstPageUpload from "./pages/FirstPageUpload";
 import ConfirmFlashCards from "./pages/ConfirmFlashCards";
 import Dashboard from "./pages/Dashboard";  
 import EditFlashCardsInProjects from "./components/sidebar/editFlashCardInProjects.tsx";
+import AddFlashcardsToFile from './components/sidebar/addFlashcardsToFile.tsx';
 import { Toaster } from "./components/ui/sonner";
 import { SidebarLayout } from "./utils/SidebarLayout";
 import SharedPage from "./pages/SharedProject/index.tsx";
@@ -27,6 +28,7 @@ function AppRoutes() {
                     <Route path="/upload/:projectID?" element={<FirstPageUpload />} />
                     <Route path="/confirmation" element={<ConfirmFlashCards />} />
                     <Route path="/edit" element={<EditFlashCardsInProjects />} />
+                    <Route path="/generate" element={<AddFlashcardsToFile />} />
                     <Route path="/shared" element={<SharedPage />} />
                 </Routes>
             </div>

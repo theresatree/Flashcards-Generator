@@ -116,6 +116,8 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
                         setCurrentQuestionCounter(prev => (prev > 0 ? prev - 1 : prev));
                     }
                 setShowAnswer(false);
+            } else if (e.code === "ArrowRight" || e.code === "KeyL"){
+                toast.error("Please select proficiency to continue")
             } else if (e.code.startsWith("Digit")) {
                 const priority = parseInt(e.code.replace("Digit", ""), 10);
                 if (!isNaN(priority) && !endOfQuestion) {
@@ -125,7 +127,7 @@ export default function SharedPageContent({selectedProjectDetails}: Props) {
         }
         document.addEventListener('keydown', handleGlobalKeyDown);
         return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-    }, [flashcards.length, activeFlashcards, currentQuestionCounter, endOfQuestion, reviewMode]);
+    }, [flashcards.length, activeFlashcards, currentQuestionCounter, endOfQuestion, reviewMode, showAnswer]);
 
 
 

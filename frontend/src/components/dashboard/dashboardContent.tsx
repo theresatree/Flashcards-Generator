@@ -109,6 +109,8 @@ export function DashboardContent() {
                     setCurrentQuestionCounter(prev => (prev > 0 ? prev - 1 : prev));
                 }
                 setShowAnswer(false);
+            } else if (e.code === "ArrowRight" || e.code === "KeyL"){
+                toast.error("Please select proficiency to continue")
             } else if (e.code.startsWith("Digit")) {
                 const priority = parseInt(e.code.replace("Digit", ""), 10);
                 if (!isNaN(priority) && !endOfQuestion) {

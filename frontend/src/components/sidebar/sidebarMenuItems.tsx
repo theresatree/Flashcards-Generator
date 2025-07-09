@@ -26,6 +26,7 @@ import { DeleteFileDialog } from "./deleteFileDialog";
 import { Link } from "react-router-dom";
 import QRDialog from "./QRDialog";
 import RAGDialog from "./RAGDialog";
+import AddFlashcardDialog from "./addFlashcardsDialog";
 
 type Props={
     projectIDs: string[],
@@ -37,6 +38,7 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
     const [reversedFilenames, setReversedFilenames] = useState<Record<string, string>>({});
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
     const [openDeleteFileDialog, setOpenDeleteFileDialog] = useState(false)
+    const [openAddFlashcardsDialog, setOpenAddFlashcardsDialog] = useState(false)
     const [flashcardsForQR, setFlashcardsForQR] = useState<Flashcard[]>([])
     const [openQRDialog, setOpenQRDialog] = useState(false)
     const [openRAGDialog, setOpenRAGDialog] = useState(false)
@@ -99,6 +101,12 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
         setOpenDeleteDialog(true)
     }
 
+    const handAddFlashcardsDialog = (project_id: string) => {
+        setCurrentProjectId(project_id)
+        setCurrentProjectFiles(projectFilesMap[project_id] || [])
+        setOpenAddFlashcardsDialog(true)
+    }
+
     const handleDeleteFileDialog = (project_id: string) => {
         setCurrentProjectId(project_id)
         setCurrentProjectFiles(projectFilesMap[project_id] || [])
@@ -153,6 +161,11 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                                 </DropdownMenuItem>
 
                                 <DropdownMenuSeparator className=""/>
+                                <DropdownMenuItem 
+                                    className="mb-1"
+                                    onClick={()=>handAddFlashcardsDialog(id)} >
+                                    Add flashcards
+                                </DropdownMenuItem>
                                 <DropdownMenuItem 
                                     className="mb-1">
                                     <Link 
@@ -217,6 +230,14 @@ export function GetSideBarMenuItems({projectIDs, projectFilesMap}: Props){
                         project_id={currentProjectId}
                         files={currentProjectFiles}
                     />
+
+                    <AddFlashcardDialog
+                        open={openAddFlashcardsDialog}
+                        onOpenChange={setOpenAddFlashcardsDialog}
+                        project_id={currentProjectId}
+                        files={currentProjectFiles}
+                    />
+
                 </>
             )}
 
