@@ -1,6 +1,6 @@
 import { GlobalWorkerOptions } from 'pdfjs-dist/build/pdf';
 
-GlobalWorkerOptions.workerSrc = '/Flashcards-Generator/pdf.worker.js';
+GlobalWorkerOptions.workerSrc = '/pdf.worker.js';
 
 
 import { HashRouter as Router, Routes, Route, useLocation } from "react-router-dom";
