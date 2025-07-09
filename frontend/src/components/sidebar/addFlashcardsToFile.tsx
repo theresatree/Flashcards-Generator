@@ -72,11 +72,6 @@ function AddFlashcardsToFile(){
                                 className="flex justify-center min-w-[200px] px-10 py-3 rounded-md border bg-white text-black-200 font-bold duration-200 hover:scale-115 hover:bg-green-500 hover:border-green-500 active:scale-125 transition-all ease-in-out">
                                 Confirm
                             </Link>
-                            <Link
-                                to="/"
-                                className="flex justify-center min-w-[200px] px-10 py-3 rounded-md bg-white font-bold transition-all ease-in-out duration-200 hover:scale-115 active:scale-125 hover:bg-red-500 hover:border-red-500">
-                                Go back 
-                            </Link>
                         </div>
                     </div>
                 </motion.div>
