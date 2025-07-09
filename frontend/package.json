@@ -1,6 +1,6 @@
 {
     "name": "frontend",
-    "homepage": "https://theresatree.github.io/Flashcards-Generator",
+    "homepage": "https://flashcards.hayes-ng.com",
     "private": true,
     "version": "0.0.0",
     "type": "module",
